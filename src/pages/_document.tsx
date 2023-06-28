@@ -4,10 +4,10 @@ import { ColorModeScript, theme } from '@chakra-ui/react';
 
 export default function Document() {
     return (
-        <Html lang="en">
+        <Html lang='en'>
             <Head />
             <ColorModeScript initialColorMode={theme.config.initialColorMode} />
-            <body style={{backgroundColor: '#FFF'}}>
+            <body style={{ backgroundColor: '#FFF' }}>
                 <Main />
                 <NextScript />
             </body>

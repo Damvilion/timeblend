@@ -1,18 +1,5 @@
 import React, { useState } from 'react';
-import {
-    Flex,
-    HStack,
-    Input,
-    Menu,
-    MenuButton,
-    MenuItem,
-    MenuList,
-    RangeSlider,
-    RangeSliderFilledTrack,
-    RangeSliderThumb,
-    RangeSliderTrack,
-    Text,
-} from '@chakra-ui/react';
+import { Flex, HStack, Input, Menu, MenuButton, MenuItem, MenuList, RangeSlider, RangeSliderFilledTrack, RangeSliderThumb, RangeSliderTrack, Text } from '@chakra-ui/react';
 import { FiChevronDown } from 'react-icons/fi';
 import CalendarPage from '@/components/Calendar/CalendarPage';
 
@@ -34,16 +21,7 @@ export default function Home() {
     return (
         <Flex direction='column' w='100%' h='100%'>
             <Flex justify='center' direction='row' w='100%' h='140px' px={[0, 1, 2, 4]} bg='#F4F7F9' borderBottom='1px dashed #dcdee0'>
-                <Flex
-                    align='center'
-                    direction='row'
-                    w={['100%', '90%', '70%', '70%']}
-                    minW='200px'
-                    maxW='920px'
-                    h='100%'
-                    px={[0, 1, 2, 4]}
-                    borderRight='1px dashed #dcdee0'
-                    borderLeft='1px dashed #dcdee0'>
+                <Flex align='center' direction='row' w={['100%', '90%', '70%', '70%']} minW='200px' maxW='920px' h='100%' px={[0, 1, 2, 4]} borderRight='1px dashed #dcdee0' borderLeft='1px dashed #dcdee0'>
                     <Text mt='50px' mr={6} ml={2} color='#625BF8' fontSize='38px' fontWeight={600}>
                         Create an Event
                     </Text>
@@ -53,16 +31,7 @@ export default function Home() {
                 </Flex>
             </Flex>
             <Flex justify='center' direction='row' w='100%' h='600px' px={[0, 1, 2, 4]} bg='white'>
-                <Flex
-                    direction='column'
-                    w={['100%', '90%', '70%', '70%']}
-                    minW='200px'
-                    maxW='920px'
-                    h='100%'
-                    px={[0, 1, 2, 4]}
-                    py={4}
-                    borderRight='1px dashed #dcdee0'
-                    borderLeft='1px dashed #dcdee0'>
+                <Flex direction='column' w={['100%', '90%', '70%', '70%']} minW='200px' maxW='920px' h='100%' px={[0, 1, 2, 4]} py={4} borderRight='1px dashed #dcdee0' borderLeft='1px dashed #dcdee0'>
                     <Flex>
                         <Flex direction='column'>
                             <Text ml={2} color='#00132C' fontSize='24px' fontWeight={600}>
@@ -99,36 +68,12 @@ export default function Home() {
                                     {sliderValue[1] < 12 || sliderValue[1] === 24 ? 'AM' : 'PM'}&nbsp;&nbsp;
                                 </Text>
                             </Flex>
-                            <RangeSlider
-                                maxW='240px'
-                                mt={3}
-                                ml={2.5}
-                                aria-label={['min', 'max']}
-                                defaultValue={[9, 17]}
-                                max={24}
-                                min={0}
-                                minStepsBetweenThumbs={1}
-                                onChange={(val) => setSliderValue(val)}
-                                step={1}>
+                            <RangeSlider maxW='240px' mt={3} ml={2.5} aria-label={['min', 'max']} defaultValue={[9, 17]} max={24} min={0} minStepsBetweenThumbs={1} onChange={(val) => setSliderValue(val)} step={1}>
                                 <RangeSliderTrack maxW='240px' h='7px' bg='gray.200'>
                                     <RangeSliderFilledTrack bg='#625BF8' />
                                 </RangeSliderTrack>
-                                <RangeSliderThumb
-                                    w='18px'
-                                    h='18px'
-                                    bg='#625BF8'
-                                    borderRadius={0}
-                                    _focus={{ outline: 'none', boxShadow: 'none' }}
-                                    index={0}
-                                />
-                                <RangeSliderThumb
-                                    w='18px'
-                                    h='18px'
-                                    bg='#625BF8'
-                                    borderRadius={0}
-                                    _focus={{ outline: 'none', boxShadow: 'none' }}
-                                    index={1}
-                                />
+                                <RangeSliderThumb w='18px' h='18px' bg='#625BF8' borderRadius={0} _focus={{ outline: 'none', boxShadow: 'none' }} index={0} />
+                                <RangeSliderThumb w='18px' h='18px' bg='#625BF8' borderRadius={0} _focus={{ outline: 'none', boxShadow: 'none' }} index={1} />
                             </RangeSlider>
 
                             <Flex maxW='240px' mt={1} ml={3} fontSize='13.5px'>
@@ -194,17 +139,7 @@ export default function Home() {
                                 Select Dates
                             </Text>
                             <Menu>
-                                <MenuButton
-                                    h='40px'
-                                    mt={2.5}
-                                    ml={2}
-                                    pr='14px'
-                                    pl='14px'
-                                    color='#00142C'
-                                    bg='#F7F7F7'
-                                    border='2px solid lightgray'
-                                    borderRadius={4}
-                                    aria-label='Options'>
+                                <MenuButton h='40px' mt={2.5} ml={2} pr='14px' pl='14px' color='#00142C' bg='#F7F7F7' border='2px solid lightgray' borderRadius={4} aria-label='Options'>
                                     <HStack w='100%'>
                                         <Text mr='auto'>{getEventTypeString(eventType)}</Text>
                                         <FiChevronDown />

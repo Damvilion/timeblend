@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Flex, HStack, Input, Menu, MenuButton, MenuItem, MenuList, RangeSlider, RangeSliderFilledTrack, RangeSliderThumb, RangeSliderTrack, Text } from '@chakra-ui/react';
 import { FiChevronDown } from 'react-icons/fi';
-import CalendarPage from '@/components/Calendar/CalendarPage';
+import ReactCalendar from '@/components/Calendar/ReactCalendar';
 
 export default function Home() {
     const [sliderValue, setSliderValue] = useState([9, 17]);
@@ -177,8 +177,9 @@ export default function Home() {
                                     </MenuItem>
                                 </MenuList>
                             </Menu>
-
-                            <CalendarPage />
+                            <Flex mt='2' p='2'>
+                                <ReactCalendar />
+                            </Flex>
                         </Flex>
                         <Flex direction='column' maxW='240px'>
                             <Text ml={2} color='#00132C' fontSize='24px' fontWeight={600}>

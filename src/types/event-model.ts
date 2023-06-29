@@ -24,7 +24,7 @@ interface personAvailability {
     specificDateTimes: specificDate[]
 }
 
-interface event {
+interface eventType {
     id: string;
     title: string;
     type: 'weekly' | 'specific';

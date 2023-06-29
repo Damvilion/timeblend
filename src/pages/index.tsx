@@ -145,25 +145,10 @@ export default function Home() {
                                         <FiChevronDown />
                                     </HStack>
                                 </MenuButton>
-                                <MenuList
-                                    w='240px'
-                                    py={0}
-                                    color='#00142C'
-                                    bg='#F7F7F7'
-                                    border='2px solid #d3d3d3'
-                                    borderRadius={4}
-                                    shadow='xl'
-                                    motionProps={{
-                                        transition: { duration: 40000 },
-                                        animate: 'visible',
-                                    }}>
-                                    <MenuItem
-                                        h='40px'
-                                        color={eventType === 'specific' ? 'white' : '#00142C'}
-                                        bg={eventType === 'specific' ? '#625BF8' : 'white'}
-                                        borderTopRadius={4}
-                                        _hover={{ bg: eventType === 'specific' ? '#625BF8' : '#9c96ff', color: 'white' }}
-                                        onClick={() => setEventType('specific')}>
+                                <MenuList w='233px' py={0} color='#00142C' bg='#F7F7F7' border='2px solid #d3d3d3' borderRadius={4} shadow='xl' motionProps={{
+                                    transition: { duration: 40000 },
+                                    animate: 'visible'}}>
+                                    <MenuItem h='40px' color={eventType === 'specific' ? 'white' : '#00142C'} bg={eventType === 'specific' ? '#625BF8' : 'white'} borderTopRadius={4} _hover={{bg: eventType === 'specific' ? '#625BF8' : '#9c96ff', color: 'white'}} onClick={() => setEventType('specific')}>
                                         Specific Dates
                                     </MenuItem>
                                     <MenuItem
@@ -182,32 +167,42 @@ export default function Home() {
                             </Flex>
                         </Flex>
                         <Flex direction='column' maxW='240px'>
-                            <Text ml={2} color='#00132C' fontSize='24px' fontWeight={600}>
-                                Timezone
-                            </Text>
+                            <Text ml={2} color='#00132C' fontSize='24px' fontWeight={600}>Timezone</Text>
+                            <Menu>
+                                <MenuButton
+                                    h='40px'
+                                    mt={2.5}
+                                    ml={2}
+                                    pr='14px'
+                                    pl="14px"
+                                    color='#00142C'
+                                    bg='#F7F7F7'
+                                    border='2px solid lightgray'
+                                    borderRadius={4}
+                                    aria-label='Options'
+                                >
+                                    <HStack w='100%'>
+                                        <Text mr='auto'>CST</Text>
+                                        <FiChevronDown />
+                                    </HStack>
+                                </MenuButton>
+                                <MenuList w='240px' py={0} color='#00142C' bg='#F7F7F7' border='2px solid #d3d3d3' borderRadius={4} shadow='xl' motionProps={{
+                                    transition: { duration: 40000 },
+                                    animate: 'visible'}}>
+                                    <MenuItem h='40px' color={eventType === 'specific' ? 'white' : '#00142C'} bg={eventType === 'specific' ? '#625BF8' : 'white'} borderTopRadius={4} _hover={{bg: eventType === 'specific' ? '#625BF8' : '#9c96ff', color: 'white'}} onClick={() => setEventType('specific')}>
+                                        Specific Dates
+                                    </MenuItem>
+                                    <MenuItem h='40px' color={eventType === 'weekly' ? 'white' : '#00142C'} bg={eventType === 'weekly' ? '#625BF8' : 'white'} borderBottomRadius={4} _hover={{bg: eventType === 'weekly' ? '#625BF8' : '#c1befa', color: 'white'}} onClick={() => setEventType('weekly')}>
+                                        Days of Week
+                                    </MenuItem>
+                                    
+                                </MenuList>
+                            </Menu>
                         </Flex>
                     </Flex>
-                    <Flex
-                        align='center'
-                        justify='center'
-                        maxW='190px'
-                        h='52px'
-                        mt={6}
-                        mr={1}
-                        ml={2}
-                        px={3}
-                        bg='#E6E7F9'
-                        borderRadius={5}
-                        shadow='0 7px 14px rgba(50, 50, 93, 0.08), 0 3px 2px rgba(0, 0, 0, 0.06);'
-                        _hover={{
-                            transform: 'translateY(-1px)',
-                            bg: '#ebecfc',
-                            cursor: 'pointer',
-                            boxShadow: '0 7px 14px rgba(50, 50, 93, 0.08), 0 3px 2px rgba(0, 0, 0, 0.06);',
-                        }}>
-                        <Text color='#625BF8' fontSize='16pt' fontWeight={600}>
-                            Create Event +
-                        </Text>
+                    <Flex align='center' justify='center' maxW='190px' h='52px' mt={6} mr={1} ml={2} px={3} bg='#E6E7F9' borderRadius={5} shadow='0 7px 14px rgba(50, 50, 93, 0.08), 0 3px 2px rgba(0, 0, 0, 0.06);' _hover={{transform: 'translateY(-1px)', bg: '#ebecfc', cursor: 'pointer', boxShadow: '0 7px 14px rgba(50, 50, 93, 0.08), 0 3px 2px rgba(0, 0, 0, 0.06);'}}>
+                        <Text color='#625BF8' fontSize='16pt' fontWeight={600}>Create Event +</Text>
+                        
                     </Flex>
                 </Flex>
             </Flex>

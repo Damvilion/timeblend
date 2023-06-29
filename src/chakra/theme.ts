@@ -5,6 +5,7 @@ import { extendTheme } from '@chakra-ui/react';
 import '@fontsource/nunito';
 import '@fontsource/sora';
 import '@fontsource/dm-sans';
+import { sliderTheme } from './components/rangeSlider';
 
 const styles = {
     fonts: {
@@ -20,6 +21,8 @@ const styles = {
     }),
 };
 
+const components = { Slider: sliderTheme };
+
 const config = {
     initialColorMode: 'light',
     useSystemColorMode: false,
@@ -29,5 +32,5 @@ const colors = {
     primary: '#e29578',
 };
 
-const theme = extendTheme({ styles, colors, config });
+const theme = extendTheme({ styles, colors, config, components });
 export default theme;

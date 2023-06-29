@@ -11,7 +11,7 @@ const Navbar:React.FC = () => {
 
     return (
         <Flex justify='center' direction="row" w='100%' h='78px' px={[0,1,2,4]} bg='#F4F7F9' borderBottom='1px dashed #dcdee0'>  
-            <Flex align='center' direction="row" w={['100%','90%','70%','70%']} minW='200px' maxW='1200px' h='100%' px={[0,1,2,4]}>
+            <Flex align='center' direction="row" w={['100%','90%','70%','70%']} minW='200px' maxW='920px' h='100%' px={[0,1,2,4]}>
                 <MdViewTimeline color='#625BF8' fontSize='34px' />
                 <Text as='span' ml={2} color='#01122C' fontSize='27px' fontWeight={600} _hover={{cursor: 'pointer'}} onClick={() => router.push('/')}>timeblend.fyi</Text>
                 <Flex align='center' justify='center' h='36px' mr={1} ml={5} px={3} borderRadius={5} _hover={{bg: 'gray.200', cursor: 'pointer'}} onClick={() => router.push('/about')}>
@@ -19,7 +19,7 @@ const Navbar:React.FC = () => {
                 </Flex>
                 <Flex align='center' ml='auto'>
                     
-                    <Flex align='center' justify='center' h='36px' mr={1} px={3} bg='#E6E7F9' borderRadius={5} _hover={{transform: 'translateY(-1px)', bg: '#ebecfc', cursor: 'pointer', boxShadow: '0 7px 14px rgba(50, 50, 93, 0.08), 0 3px 2px rgba(0, 0, 0, 0.06);'}} onClick={() => router.push('/')}>
+                    <Flex align='center' justify='center' h='36px' mr={3} px={3} bg='#E6E7F9' borderRadius={5} _hover={{transform: 'translateY(-1px)', bg: '#ebecfc', cursor: 'pointer', boxShadow: '0 7px 14px rgba(50, 50, 93, 0.08), 0 3px 2px rgba(0, 0, 0, 0.06);'}} onClick={() => router.push('/')}>
                         <Text color='#625BF8' fontWeight={600}>Create Event +</Text>
                     </Flex>
                     

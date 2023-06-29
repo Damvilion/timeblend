@@ -4,10 +4,10 @@ type monthDay = {
     year: string;
     month: 'January' | 'February' | 'March' | 'April' | 'May' | 'June' | 'July' | 'August' | 'September' | 'October' | 'November' | 'December'
     day: string;
-}
+};
 
 interface weeklyDate {
-    weekDay: weekDay 
+    weekDay: weekDay;
     startTime: string;
     endTime: string;
 }
@@ -15,6 +15,7 @@ interface weeklyDate {
 interface specificDate {
     month: string;
     day: string;
+    year: string;
     startTime: string;
     endTime: string;
 }
@@ -22,7 +23,7 @@ interface specificDate {
 interface personAvailability {
     personName: string;
     weeklyDateTimes: weeklyDate[];
-    specificDateTimes: specificDate[]
+    specificDateTimes: specificDate[];
 }
 
 interface eventType {

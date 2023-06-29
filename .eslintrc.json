@@ -3,12 +3,7 @@
         "browser": true,
         "es2021": true
     },
-    "extends": [
-        "eslint:recommended",
-        "plugin:react/recommended",
-        "plugin:@typescript-eslint/recommended",
-        "prettier"
-    ],
+    "extends": ["eslint:recommended", "plugin:react/recommended", "plugin:@typescript-eslint/recommended", "prettier"],
     "overrides": [],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -38,7 +33,7 @@
         "chakra-ui/require-specific-component": "error",
         "unused-imports/no-unused-imports": "error",
         "no-multiple-empty-lines": ["warn", { "max": 1, "maxBOF": 1 }],
-        "indent": ["error", 4],
+        // "indent": ["error", 4],
 
         "quotes": ["error", "single"],
         "semi": ["error", "always"]

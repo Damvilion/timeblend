@@ -6,10 +6,29 @@
 .MuiPickersCalendarHeader-root {
     background-color: #303443;
 } */
+
+/* .css-k008qs {
+    margin: 20px;
+} */
+
+/* Handles the background color of the entire calendar */
 .MuiDateCalendar-root {
     background-color: #303443;
 }
 
-.css-k008qs {
-    margin: 20px;
+/* Classes to handle calendar's position */
+.MuiDateCalendar-root,
+.css-cwhad8-MuiDateCalendar-root {
+    margin: 0;
+    padding: 0;
+    border-radius: 10px;
+}
+/* Text Colors {numbers}*/
+.MuiPickersDay-dayWithMargin {
+    color: beige;
+}
+
+/* Text colors {Sunday - Saturday} */
+.MuiTypography-root {
+    color: beige;
 }

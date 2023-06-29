@@ -1,10 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { ThemeProvider, createTheme } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
-import { TimeClock } from '@mui/x-date-pickers/TimeClock';
-import Grid from '@mui/material/Grid';
 import dayjs from 'dayjs';
 
 const CalendarPage = () => {
@@ -14,17 +12,23 @@ const CalendarPage = () => {
 
     const theme = createTheme();
 
+    const [selectedDate, setSelectedDate] = useState(null);
+    const handleDateChange = (date: any) => {
+        console.log(date);
+        setSelectedDate(date);
+    };
+
     return (
         <ThemeProvider theme={theme}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <Grid container columns={{ xs: 1, lg: 2 }} spacing={4} alignItems='center' justifyContent='center'>
-                    <Grid item>
-                        <DateCalendar defaultValue={today} disableFuture />
-                    </Grid>
-                    <Grid item>
+                {/* <Grid container columns={{ xs: 1, lg: 2 }} spacing={4} alignItems='center' justifyContent='center'>
+                    <Grid item> */}
+                <DateCalendar value={selectedDate} onChange={handleDateChange} />
+                {/* </Grid> */}
+                {/* <Grid item>
                         <TimeClock defaultValue={twoPM} maxTime={threePM} />
-                    </Grid>
-                </Grid>
+                    </Grid> */}
+                {/* </Grid> */}
             </LocalizationProvider>
         </ThemeProvider>
     );

@@ -55,7 +55,7 @@ export default function Home() {
                         placeholder='Ex: Coding Session'
                         spellCheck='false'
                     />
-                    <Flex>
+                    <Flex justify='flex-start' direction='row' m='2'>
                         <CalendarPage />
                     </Flex>
                     {/* <Text mt={4} ml={2} color='#00132C' fontSize='24px' fontWeight={600}>Custom URL (optional)</Text> */}

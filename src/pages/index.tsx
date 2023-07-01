@@ -138,7 +138,7 @@ export default function Home() {
                                     </MenuItem>
                                 </MenuList>
                             </Menu>
-                            <Flex mt='4' mb={2} ml={[2,10,2,2]}>
+                            <Flex mt='9' mb={2} ml={[2,10,2,2]}>
                                 {eventType === 'specific' &&  <ReactCalendar />}
                                 {eventType === 'weekly' && <WeeklySelect />}
                             </Flex>

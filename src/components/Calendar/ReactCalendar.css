@@ -1,0 +1,23 @@
+.rmdp-wrapper {
+    background-color: #F7F7F7 !important;
+    border: 2px solid #D3D3D3 !important;
+    box-shadow: none !important;
+    width: 330px !important;
+    padding: 12px 30px 12px 30px;
+}
+
+.rmdp-header {
+    font-weight: 600 !important;
+    font-size: 12.5pt !important;
+}
+
+.rmdp-week-day {
+    font-weight: 600 !important;
+    font-size: 10.5pt !important;
+    color: #625BF8 !important;
+}
+
+.rmdp-selected span {
+    background-color: #625BF8 !important;
+    border-radius: 3px !important;
+}

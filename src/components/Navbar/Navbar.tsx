@@ -11,7 +11,7 @@ const Navbar: React.FC = () => {
 
     return (
         <Flex justify='center' direction='row' w='100%' h='78px' px={[0, 1, 2, 4]} bg='#F4F7F9' borderBottom='1px dashed #dcdee0'>
-            <Flex align='center' direction='row' w={['100%', '90%', '70%', '70%']} minW='200px' maxW='920px' h='100%' px={[0, 1, 2, 4]}>
+            <Flex align='center' direction='row' w='100%' minW='200px' maxW='800px' h='100%' px={[0, 1, 2, 4]}>
                 <MdViewTimeline color='#625BF8' fontSize='34px' />
                 <Text as='span' ml={2} color='#01122C' fontSize='27px' fontWeight={600} _hover={{ cursor: 'pointer' }} onClick={() => router.push('/')}>
                     timeblend.fyi

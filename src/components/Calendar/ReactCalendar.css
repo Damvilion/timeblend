@@ -3,10 +3,12 @@
     border: 2px solid #D3D3D3 !important;
     box-shadow: none !important;
     width: 330px !important;
-    padding: 12px 30px 12px 30px;
+    /* padding: 12px 30px 12px 30px; */
+    flex-shrink: 0 !important;
 }
 
 .rmdp-header {
+    width: 330px !important;
     font-weight: 600 !important;
     font-size: 12.5pt !important;
 }

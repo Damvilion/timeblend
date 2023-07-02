@@ -45,7 +45,7 @@ export default function Home() {
                                 ml={[2,10,2,2]}
                                 color='gray.600'
                                 fontSize='16px'
-                                fontWeight={500}
+                                fontWeight={600}
                                 bg='#F7F7F7'
                                 border='2px solid lightgray'
                                 borderRadius={4}

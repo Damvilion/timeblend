@@ -2,7 +2,7 @@ type weekDay = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Sat
 
 type monthDay = {
     year: string;
-    month: 'January' | 'February' | 'March' | 'April' | 'May' | 'June' | 'July' | 'August' | 'September' | 'October' | 'November' | 'December'
+    month: 'January' | 'February' | 'March' | 'April' | 'May' | 'June' | 'July' | 'August' | 'September' | 'October' | 'November' | 'December';
     day: string;
 };
 
@@ -16,8 +16,8 @@ interface specificDate {
     month: string;
     day: string;
     year: string;
-    startTime: string;
-    endTime: string;
+    startTime: number;
+    endTime: number;
 }
 
 interface personAvailability {

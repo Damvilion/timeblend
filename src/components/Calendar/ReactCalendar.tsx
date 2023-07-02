@@ -2,7 +2,11 @@
 import React from 'react';
 import { Calendar } from 'react-multi-date-picker';
 
-const ReactCalendar = () => {
+interface sliderValue {
+    sliderValue: number[];
+}
+
+const ReactCalendar = ({ sliderValue }: sliderValue) => {
     let info: any = [];
     const handleSelection = (value: any) => {
         // Gets the data from the calendar and makes it into an array
@@ -18,10 +22,12 @@ const ReactCalendar = () => {
         const formated = () => {
             for (const date of sortedDates) {
                 const [year, month, day] = date.split('/');
-                const newDate = {
+                const newDate: specificDate = {
                     year: year,
                     month: month,
                     day: day,
+                    startTime: sliderValue[0],
+                    endTime: sliderValue[1],
                 };
 
                 info.push(newDate);

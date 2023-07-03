@@ -1,13 +1,13 @@
 'use client';
-import { specificDate } from '@/types/event-model';
+import { EventType, specificDate } from '@/types/event-model';
 import React from 'react';
 import { Calendar } from 'react-multi-date-picker';
 
 interface sliderValue {
-    sliderValue: number[];
+    setEventForm: React.Dispatch<React.SetStateAction<EventType>>;
 }
 
-const ReactCalendar = ({ sliderValue }: sliderValue) => {
+const ReactCalendar = ({ setEventForm }: sliderValue) => {
     let info: any = [];
     const handleSelection = (value: any) => {
         // Gets the data from the calendar and makes it into an array
@@ -27,8 +27,6 @@ const ReactCalendar = ({ sliderValue }: sliderValue) => {
                     year: year,
                     month: month,
                     day: day,
-                    startTime: sliderValue[0],
-                    endTime: sliderValue[1],
                 };
 
                 info.push(newDate);
@@ -37,12 +35,24 @@ const ReactCalendar = ({ sliderValue }: sliderValue) => {
         //  Resets the array then Sorts the value of all the dates into an object
         info = [];
         formated();
+
         console.log(info);
     };
 
     return (
         <div>
-            <Calendar value={null} onChange={handleSelection} multiple range={false} />
+            <Calendar
+                value={null}
+                onChange={(e) => {
+                    handleSelection(e);
+                    setEventForm((prev) => ({
+                        ...prev,
+                        specificDays: info,
+                    }));
+                }}
+                multiple
+                range={false}
+            />
         </div>
     );
 };

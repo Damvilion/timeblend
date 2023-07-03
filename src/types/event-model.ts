@@ -16,8 +16,6 @@ export interface specificDate {
     month: string;
     day: string;
     year: string;
-    startTime: number;
-    endTime: number;
 }
 
 interface personAvailability {

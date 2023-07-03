@@ -4,13 +4,42 @@ import { FiChevronDown } from 'react-icons/fi';
 import ReactCalendar from '@/components/Calendar/ReactCalendar';
 import WeeklySelect from '@/components/WeeklySelect/WeeklySelect';
 import { EventType } from '@/types/event-model';
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '@/firebase-config';
 
 export default function Home() {
     const [sliderValue, setSliderValue] = useState([9, 17]);
     const [error, setError] = useState('');
 
+    const generateRandomString = () => {
+        const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        let randomString = '';
+        for (let i = 0; i < 6; i++) {
+            randomString += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+        return randomString;
+    };
+
+    const createDoc = async () => {
+        try {
+            const res = await setDoc(doc(db, 'Events', eventForm.id), {
+                id: eventForm.id,
+                title: eventForm.title,
+                type: eventForm.type,
+                weeklyDays: eventForm.weeklyDays,
+                specificDays: eventForm.specificDays,
+                blendMatrix: eventForm.blendMatrix,
+                beginTime: eventForm.beginTime,
+                endTime: eventForm.endTime,
+            });
+            console.log(res);
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
     const [eventForm, setEventForm] = useState<EventType>({
-        id: '',
+        id: generateRandomString(),
         title: '',
         type: 'specific',
         weeklyDays: [false, false, false, false, false, false, false],
@@ -48,11 +77,12 @@ export default function Home() {
             setError('Please enter an event Title');
             return;
         }
-        
+
         if (eventForm.type === 'weekly' && eventForm.weeklyDays.filter((d) => d === true).length === 0) {
             setError('Please select at least 1 week day.');
             return;
         }
+
         console.log(eventForm);
     };
 
@@ -196,10 +226,12 @@ export default function Home() {
                                         bg={eventForm.type === 'specific' ? '#625BF8' : 'white'}
                                         borderTopRadius={4}
                                         _hover={{ bg: eventForm.type === 'specific' ? '#625BF8' : '#9c96ff', color: 'white' }}
-                                        onClick={() => setEventForm((prev) => ({
-                                            ...prev,
-                                            type: 'specific',
-                                        }))}>
+                                        onClick={() =>
+                                            setEventForm((prev) => ({
+                                                ...prev,
+                                                type: 'specific',
+                                            }))
+                                        }>
                                         Specific Dates
                                     </MenuItem>
                                     <MenuItem
@@ -208,16 +240,18 @@ export default function Home() {
                                         bg={eventForm.type === 'weekly' ? '#625BF8' : 'white'}
                                         borderBottomRadius={4}
                                         _hover={{ bg: eventForm.type === 'weekly' ? '#625BF8' : '#c1befa', color: 'white' }}
-                                        onClick={() => setEventForm((prev) => ({
-                                            ...prev,
-                                            type: 'weekly',
-                                        }))}>
+                                        onClick={() =>
+                                            setEventForm((prev) => ({
+                                                ...prev,
+                                                type: 'weekly',
+                                            }))
+                                        }>
                                         Days of Week
                                     </MenuItem>
                                 </MenuList>
                             </Menu>
                             <Flex mt='9' mb={2} ml={[2, 10, 2, 2]}>
-                                {eventForm.type === 'specific' && <ReactCalendar sliderValue={sliderValue} />}
+                                {eventForm.type === 'specific' && <ReactCalendar setEventForm={setEventForm} />}
                                 {eventForm.type === 'weekly' && <WeeklySelect eventForm={eventForm} setEventForm={setEventForm} />}
                             </Flex>
                             <Text ml={[2, 10, 2, 2]} color='#717171' fontSize='11.5pt'>
@@ -270,12 +304,19 @@ export default function Home() {
                         borderRadius={5}
                         shadow='0 7px 14px rgba(50, 50, 93, 0.08), 0 3px 2px rgba(0, 0, 0, 0.06);'
                         _hover={{ transform: 'translateY(-1px)', bg: '#ebecfc', cursor: 'pointer', boxShadow: '0 7px 14px rgba(50, 50, 93, 0.08), 0 3px 2px rgba(0, 0, 0, 0.06);' }}
-                        onClick={() => {updateFormHandler();}}>
+                        onClick={() => {
+                            updateFormHandler();
+                            createDoc();
+                        }}>
                         <Text color='#625BF8' fontSize='16pt' fontWeight={600}>
                             Create Event +
                         </Text>
                     </Flex>
-                    {error.length > 0 && <Text mt={-5} ml={2} color='red.300' fontWeight={600}>{error}</Text>}
+                    {error.length > 0 && (
+                        <Text mt={-5} ml={2} color='red.300' fontWeight={600}>
+                            {error}
+                        </Text>
+                    )}
                 </Flex>
             </Flex>
         </Flex>

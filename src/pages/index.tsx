@@ -32,7 +32,7 @@ export default function Home() {
                 beginTime: eventForm.beginTime,
                 endTime: eventForm.endTime,
             });
-            console.log(res);
+            console.log('Success');
         } catch (err) {
             console.log(err);
         }

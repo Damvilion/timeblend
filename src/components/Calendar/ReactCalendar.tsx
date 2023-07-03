@@ -1,4 +1,5 @@
 'use client';
+import { specificDate } from '@/types/event-model';
 import React from 'react';
 import { Calendar } from 'react-multi-date-picker';
 

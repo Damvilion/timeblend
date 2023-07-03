@@ -1,4 +1,4 @@
-type weekDay = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+export type weekDay = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
 
 type monthDay = {
     year: string;
@@ -12,7 +12,7 @@ interface weeklyDate {
     endTime: string;
 }
 
-interface specificDate {
+export interface specificDate {
     month: string;
     day: string;
     year: string;
@@ -26,15 +26,15 @@ interface personAvailability {
     specificDateTimes: specificDate[];
 }
 
-interface eventType {
+export interface EventType {
     id: string;
     title: string;
     type: 'weekly' | 'specific';
-    weeklyDays?: weekDay[];
+    weeklyDays: boolean[];
     specificDays?: monthDay[];
     beginTime: string;
     endTime: string;
-    timeZone: string;
+    timeZone?: string;
     blendMatrix: personAvailability[];
 }
 

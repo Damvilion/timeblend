@@ -3,13 +3,32 @@ import { Flex, HStack, Input, Menu, MenuButton, MenuItem, MenuList, RangeSlider,
 import { FiChevronDown } from 'react-icons/fi';
 import ReactCalendar from '@/components/Calendar/ReactCalendar';
 import WeeklySelect from '@/components/WeeklySelect/WeeklySelect';
+import { EventType } from '@/types/event-model';
 
 export default function Home() {
     const [sliderValue, setSliderValue] = useState([9, 17]);
-    const [eventType, setEventType] = useState<eventType['type']>('specific');
+    const [error, setError] = useState('');
 
-    const getEventTypeString = (s: eventType['type']) => {
-        switch (eventType) {
+    const [eventForm, setEventForm] = useState<EventType>({
+        id: '',
+        title: '',
+        type: 'specific',
+        weeklyDays: [false, false, false, false, false, false, false],
+        specificDays: [],
+        beginTime: '9AM',
+        endTime: '5PM',
+        blendMatrix: [],
+    });
+
+    const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setEventForm((prev) => ({
+            ...prev,
+            [event.target.name]: event.target.value,
+        }));
+    };
+
+    const getEventTypeString = () => {
+        switch (eventForm.type) {
             case 'specific':
                 return 'Specific Dates';
             case 'weekly':
@@ -19,6 +38,24 @@ export default function Home() {
         }
     };
 
+    const updateFormHandler = () => {
+        onSubmit();
+    };
+
+    const onSubmit = () => {
+        setError('');
+        if (eventForm.title === '') {
+            setError('Please enter an event Title');
+            return;
+        }
+        
+        if (eventForm.type === 'weekly' && eventForm.weeklyDays.filter((d) => d === true).length === 0) {
+            setError('Please select at least 1 week day.');
+            return;
+        }
+        console.log(eventForm);
+    };
+
     return (
         <Flex direction='column' w='100%' h='100%'>
             <Flex justify='center' direction='row' w='100%' h='140px' px={[0, 2, 4, 4]} bg='#F4F7F9' borderBottom='1px dashed #dcdee0'>
@@ -26,9 +63,6 @@ export default function Home() {
                     <Text mt='50px' mr={6} ml={[2, 10, 2, 2]} color='#625BF8' fontSize='40px' fontWeight={600}>
                         Create an Event
                     </Text>
-                    {/* <Flex align='center' h='26px' mt='61px' px={2} border='1.5px dashed #00132C' borderRadius={4}>
-                    <Text color='#00132C'>+</Text>
-                </Flex> */}
                 </Flex>
             </Flex>
             <Flex justify='center' direction='row' w='100%' h={['920px', '920px', '630px', '630px']} px={[0, 2, 4, 4]} bg='white'>
@@ -52,7 +86,10 @@ export default function Home() {
                                 _hover={{ border: '2px solid #7A84E8' }}
                                 _focus={{ boxShadow: 'none', outline: 'none', border: '2px solid #7A84E8' }}
                                 _placeholder={{ color: 'gray' }}
+                                name='title'
+                                onChange={onChange}
                                 placeholder='Ex: Coding Session'
+                                required
                                 spellCheck='false'
                             />
 
@@ -137,7 +174,7 @@ export default function Home() {
                                     borderRadius={4}
                                     aria-label='Options'>
                                     <HStack w='100%'>
-                                        <Text mr='auto'>{getEventTypeString(eventType)}</Text>
+                                        <Text mr='auto'>{getEventTypeString()}</Text>
                                         <FiChevronDown />
                                     </HStack>
                                 </MenuButton>
@@ -155,65 +192,38 @@ export default function Home() {
                                     }}>
                                     <MenuItem
                                         h='40px'
-                                        color={eventType === 'specific' ? 'white' : '#00142C'}
-                                        bg={eventType === 'specific' ? '#625BF8' : 'white'}
+                                        color={eventForm.type === 'specific' ? 'white' : '#00142C'}
+                                        bg={eventForm.type === 'specific' ? '#625BF8' : 'white'}
                                         borderTopRadius={4}
-                                        _hover={{ bg: eventType === 'specific' ? '#625BF8' : '#9c96ff', color: 'white' }}
-                                        onClick={() => setEventType('specific')}>
+                                        _hover={{ bg: eventForm.type === 'specific' ? '#625BF8' : '#9c96ff', color: 'white' }}
+                                        onClick={() => setEventForm((prev) => ({
+                                            ...prev,
+                                            type: 'specific',
+                                        }))}>
                                         Specific Dates
                                     </MenuItem>
                                     <MenuItem
                                         h='40px'
-                                        color={eventType === 'weekly' ? 'white' : '#00142C'}
-                                        bg={eventType === 'weekly' ? '#625BF8' : 'white'}
+                                        color={eventForm.type === 'weekly' ? 'white' : '#00142C'}
+                                        bg={eventForm.type === 'weekly' ? '#625BF8' : 'white'}
                                         borderBottomRadius={4}
-                                        _hover={{ bg: eventType === 'weekly' ? '#625BF8' : '#c1befa', color: 'white' }}
-                                        onClick={() => setEventType('weekly')}>
+                                        _hover={{ bg: eventForm.type === 'weekly' ? '#625BF8' : '#c1befa', color: 'white' }}
+                                        onClick={() => setEventForm((prev) => ({
+                                            ...prev,
+                                            type: 'weekly',
+                                        }))}>
                                         Days of Week
                                     </MenuItem>
                                 </MenuList>
                             </Menu>
                             <Flex mt='9' mb={2} ml={[2, 10, 2, 2]}>
-                                {eventType === 'specific' && <ReactCalendar sliderValue={sliderValue} />}
-                                {eventType === 'weekly' && <WeeklySelect />}
+                                {eventForm.type === 'specific' && <ReactCalendar sliderValue={sliderValue} />}
+                                {eventForm.type === 'weekly' && <WeeklySelect eventForm={eventForm} setEventForm={setEventForm} />}
                             </Flex>
                             <Text ml={[2, 10, 2, 2]} color='#717171' fontSize='11.5pt'>
                                 Click and drag to select date ranges.
                             </Text>
                         </Flex>
-                        {/* <Flex direction='column' maxW='240px'>
-                            <Text ml={2} color='#00132C' fontSize='24px' fontWeight={600}>Timezone</Text>
-                            <Menu>
-                                <MenuButton
-                                    h='40px'
-                                    mt={2.5}
-                                    ml={2}
-                                    pr='14px'
-                                    pl="14px"
-                                    color='#00142C'
-                                    bg='#F7F7F7'
-                                    border='2px solid lightgray'
-                                    borderRadius={4}
-                                    aria-label='Options'
-                                >
-                                    <HStack w='100%'>
-                                        <Text mr='auto'>CST</Text>
-                                        <FiChevronDown />
-                                    </HStack>
-                                </MenuButton>
-                                <MenuList w='240px' py={0} color='#00142C' bg='#F7F7F7' border='2px solid #d3d3d3' borderRadius={4} shadow='xl' motionProps={{
-                                    transition: { duration: 40000 },
-                                    animate: 'visible'}}>
-                                    <MenuItem h='40px' color={eventType === 'specific' ? 'white' : '#00142C'} bg={eventType === 'specific' ? '#625BF8' : 'white'} borderTopRadius={4} _hover={{bg: eventType === 'specific' ? '#625BF8' : '#9c96ff', color: 'white'}} onClick={() => setEventType('specific')}>
-                                        Specific Dates
-                                    </MenuItem>
-                                    <MenuItem h='40px' color={eventType === 'weekly' ? 'white' : '#00142C'} bg={eventType === 'weekly' ? '#625BF8' : 'white'} borderBottomRadius={4} _hover={{bg: eventType === 'weekly' ? '#625BF8' : '#c1befa', color: 'white'}} onClick={() => setEventType('weekly')}>
-                                        Days of Week
-                                    </MenuItem>
-                                    
-                                </MenuList>
-                            </Menu>
-                        </Flex> */}
                     </Flex>
                     <Flex justify='center' direction='column' w='340px' mt={['-16px', '-16px', '-100px', '-100px']} ml={[2, 10, 2, 2]}>
                         <Flex align='center' mt={10}>
@@ -234,6 +244,9 @@ export default function Home() {
                                 _hover={{ border: '2px solid #7A84E8' }}
                                 _focus={{ boxShadow: 'none', outline: 'none', border: '2px solid #7A84E8' }}
                                 _placeholder={{ color: 'gray' }}
+                                maxLength={10}
+                                name='id'
+                                onChange={onChange}
                                 placeholder='custom id'
                                 spellCheck='false'
                             />
@@ -256,11 +269,13 @@ export default function Home() {
                         bg='#E6E7F9'
                         borderRadius={5}
                         shadow='0 7px 14px rgba(50, 50, 93, 0.08), 0 3px 2px rgba(0, 0, 0, 0.06);'
-                        _hover={{ transform: 'translateY(-1px)', bg: '#ebecfc', cursor: 'pointer', boxShadow: '0 7px 14px rgba(50, 50, 93, 0.08), 0 3px 2px rgba(0, 0, 0, 0.06);' }}>
+                        _hover={{ transform: 'translateY(-1px)', bg: '#ebecfc', cursor: 'pointer', boxShadow: '0 7px 14px rgba(50, 50, 93, 0.08), 0 3px 2px rgba(0, 0, 0, 0.06);' }}
+                        onClick={() => {updateFormHandler();}}>
                         <Text color='#625BF8' fontSize='16pt' fontWeight={600}>
                             Create Event +
                         </Text>
                     </Flex>
+                    {error.length > 0 && <Text mt={-5} ml={2} color='red.300' fontWeight={600}>{error}</Text>}
                 </Flex>
             </Flex>
         </Flex>

@@ -22,7 +22,7 @@ export default function Home() {
 
     const createDoc = async () => {
         try {
-            const res = await setDoc(doc(db, 'Events', eventForm.id), {
+            await setDoc(doc(db, 'Events', eventForm.id), {
                 id: eventForm.id,
                 title: eventForm.title,
                 type: eventForm.type,
@@ -44,8 +44,8 @@ export default function Home() {
         type: 'specific',
         weeklyDays: [false, false, false, false, false, false, false],
         specificDays: [],
-        beginTime: '9AM',
-        endTime: '5PM',
+        beginTime: sliderValue[0],
+        endTime: sliderValue[1],
         blendMatrix: [],
     });
 
@@ -146,7 +146,14 @@ export default function Home() {
                                 max={24}
                                 min={0}
                                 minStepsBetweenThumbs={1}
-                                onChange={(val) => setSliderValue(val)}
+                                onChange={(val) => {
+                                    setSliderValue(val);
+                                    setEventForm((prev) => ({
+                                        ...prev,
+                                        beginTime: val[0],
+                                        endTime: val[1],
+                                    }));
+                                }}
                                 step={1}>
                                 <RangeSliderTrack maxW='340px' h='7px' bg='gray.200'>
                                     <RangeSliderFilledTrack bg='#625BF8' />

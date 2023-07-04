@@ -35,8 +35,6 @@ const ReactCalendar = ({ setEventForm }: sliderValue) => {
         //  Resets the array then Sorts the value of all the dates into an object
         info = [];
         formated();
-
-        console.log(info);
     };
 
     return (

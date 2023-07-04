@@ -85,7 +85,9 @@ export default function About({ eventData }: EventPageProps) {
                                     borderRadius={5}
                                     shadow='0 7px 14px rgba(50, 50, 93, 0.08), 0 3px 2px rgba(0, 0, 0, 0.06);'
                                     _hover={{ transform: 'translateY(-1px)', bg: '#ebecfc', cursor: 'pointer', boxShadow: '0 7px 14px rgba(50, 50, 93, 0.08), 0 3px 2px rgba(0, 0, 0, 0.06);' }}
-                                    onClick={onRespond}>
+                                    userSelect='none'
+                                    onClick={onRespond}
+                                    >
                                     <HStack>
                                         {addingPerson === true && <HiOutlineArrowSmLeft color='#625BF8' fontSize='18pt' />}
                                         {addingPerson === false && <PiCalendarPlusBold color='#625BF8' fontSize='18pt' />}
@@ -108,6 +110,7 @@ export default function About({ eventData }: EventPageProps) {
                                     borderRadius={5}
                                     shadow='0 7px 14px rgba(50, 50, 93, 0.08), 0 3px 2px rgba(0, 0, 0, 0.06);'
                                     _hover={{ transform: 'translateY(-1px)', bg: '#F9f9f9', cursor: 'pointer', boxShadow: '0 7px 14px rgba(50, 50, 93, 0.08), 0 3px 2px rgba(0, 0, 0, 0.06);' }}
+                                    userSelect='none'
                                     onClick={onCopyLink}>
                                     <HStack>
                                         {inviteText === 'Invite' && <BsLink color='#625BF8' fontSize='18pt' />}

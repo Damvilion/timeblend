@@ -1,15 +1,19 @@
-import React, { useState } from 'react';
-import { Flex, HStack, Input, Menu, MenuButton, MenuItem, MenuList, RangeSlider, RangeSliderFilledTrack, RangeSliderThumb, RangeSliderTrack, Text } from '@chakra-ui/react';
+import React, { useEffect, useState } from 'react';
+import { Button, Flex, HStack, Input, Menu, MenuButton, MenuItem, MenuList, RangeSlider, RangeSliderFilledTrack, RangeSliderThumb, RangeSliderTrack, Text } from '@chakra-ui/react';
 import { FiChevronDown } from 'react-icons/fi';
 import ReactCalendar from '@/components/Calendar/ReactCalendar';
 import WeeklySelect from '@/components/WeeklySelect/WeeklySelect';
 import { EventType } from '@/types/event-model';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/firebase-config';
+import { useRouter } from 'next/router';
 
 export default function Home() {
     const [sliderValue, setSliderValue] = useState([9, 17]);
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const router = useRouter();
 
     const generateRandomString = () => {
         const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -20,9 +24,38 @@ export default function Home() {
         return randomString;
     };
 
+    const [eventForm, setEventForm] = useState<EventType>({
+        id: generateRandomString(),
+        title: '',
+        type: 'specific',
+        weeklyDays: [false, false, false, false, false, false, false],
+        specificDays: [],
+        beginTime: '9AM',
+        endTime: '5PM',
+        blendMatrix: [],
+    });
+
+    useEffect(() => {
+        setEventForm((prev) => ({
+            ...prev,
+            beginTime: sliderValue[0] < 12 || sliderValue[0] === 24 ? `${(sliderValue[0] % 12 === 0 ? 12 : sliderValue[0] % 12).toString()}AM` : `${(sliderValue[0] % 12 === 0 ? 12 : sliderValue[0] % 12).toString()}PM`,
+            endTime: sliderValue[1] < 12 || sliderValue[1] === 24 ? `${(sliderValue[1] % 12 === 0 ? 12 : sliderValue[1] % 12).toString()}AM` : `${(sliderValue[1] % 12 === 0 ? 12 : sliderValue[1] % 12).toString()}PM`
+        }));
+    }, [sliderValue]);
+
     const createDoc = async () => {
+        setError('');
         try {
-            await setDoc(doc(db, 'Events', eventForm.id), {
+            const eventDocRef = doc(db, 'Events', eventForm.id);
+            const eventDoc = await getDoc(eventDocRef);
+          
+            if (eventDoc.exists()) {
+                setError('An Event with this id already exists. Please change it and try again.');
+                setLoading(false);
+                return;
+            }
+
+            const res = await setDoc(doc(db, 'Events', eventForm.id), {
                 id: eventForm.id,
                 title: eventForm.title,
                 type: eventForm.type,
@@ -33,22 +66,12 @@ export default function Home() {
                 endTime: eventForm.endTime,
             });
             console.log('Success');
+            router.push(`/events/${eventForm.id}`);
         } catch (err) {
             console.log(err);
+            setLoading(false);
         }
     };
-
-    const [eventForm, setEventForm] = useState<EventType>({
-        id: generateRandomString(),
-        title: '',
-        type: 'specific',
-        weeklyDays: [false, false, false, false, false, false, false],
-        specificDays: [],
-        beginTime: sliderValue[0],
-        endTime: sliderValue[1],
-        blendMatrix: [],
-    });
-
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setEventForm((prev) => ({
             ...prev,
@@ -67,30 +90,28 @@ export default function Home() {
         }
     };
 
-    const updateFormHandler = () => {
-        onSubmit();
-    };
-
     const onSubmit = () => {
         setError('');
+        setLoading(true);
         if (eventForm.title === '') {
             setError('Please enter an event Title');
+            setLoading(false);
             return;
         }
 
         if (eventForm.type === 'weekly' && eventForm.weeklyDays.filter((d) => d === true).length === 0) {
             setError('Please select at least 1 week day.');
+            setLoading(false);
             return;
         }
-
-        console.log(eventForm);
+        createDoc();
     };
 
     return (
         <Flex direction='column' w='100%' h='100%'>
             <Flex justify='center' direction='row' w='100%' h='140px' px={[0, 2, 4, 4]} bg='#F4F7F9' borderBottom='1px dashed #dcdee0'>
                 <Flex align='center' direction='row' w='100%' minW='200px' maxW='800px' h='100%' px={[0, 1, 2, 4]} borderRight='1px dashed #dcdee0' borderLeft='1px dashed #dcdee0'>
-                    <Text mt='50px' mr={6} ml={[2, 10, 2, 2]} color='#625BF8' fontSize='40px' fontWeight={600}>
+                    <Text mt='50px' mr={6} ml={[2, 10, 2, 2]} color='#625BF8' fontSize='40px' fontWeight={600} userSelect='none'>
                         Create an Event
                     </Text>
                 </Flex>
@@ -266,7 +287,7 @@ export default function Home() {
                             </Text>
                         </Flex>
                     </Flex>
-                    <Flex justify='center' direction='column' w='340px' mt={['-16px', '-16px', '-100px', '-100px']} ml={[2, 10, 2, 2]}>
+                    <Flex justify='center' direction='column' w='340px' mt={['-16px', '-16px', '-100px', eventForm.type === 'specific' ? '-200px' : '-100px']} ml={[2, 10, 2, 2]}>
                         <Flex align='center' mt={10}>
                             <Text color='#00132C' fontSize='22px'>
                                 timeblend.fyi/events/
@@ -312,12 +333,11 @@ export default function Home() {
                         shadow='0 7px 14px rgba(50, 50, 93, 0.08), 0 3px 2px rgba(0, 0, 0, 0.06);'
                         _hover={{ transform: 'translateY(-1px)', bg: '#ebecfc', cursor: 'pointer', boxShadow: '0 7px 14px rgba(50, 50, 93, 0.08), 0 3px 2px rgba(0, 0, 0, 0.06);' }}
                         onClick={() => {
-                            updateFormHandler();
-                            createDoc();
+                            onSubmit();
                         }}>
-                        <Text color='#625BF8' fontSize='16pt' fontWeight={600}>
+                        <Button color='#625BF8' fontSize='16pt' fontWeight={600} isLoading={loading}>
                             Create Event +
-                        </Text>
+                        </Button>
                     </Flex>
                     {error.length > 0 && (
                         <Text mt={-5} ml={2} color='red.300' fontWeight={600}>

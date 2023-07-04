@@ -72,7 +72,6 @@ export default function Home() {
             setLoading(false);
         }
     };
-
     const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setEventForm((prev) => ({
             ...prev,
@@ -168,7 +167,14 @@ export default function Home() {
                                 max={24}
                                 min={0}
                                 minStepsBetweenThumbs={1}
-                                onChange={(val) => setSliderValue(val)}
+                                onChange={(val) => {
+                                    setSliderValue(val);
+                                    setEventForm((prev) => ({
+                                        ...prev,
+                                        beginTime: val[0],
+                                        endTime: val[1],
+                                    }));
+                                }}
                                 step={1}>
                                 <RangeSliderTrack maxW='340px' h='7px' bg='gray.200'>
                                     <RangeSliderFilledTrack bg='#625BF8' />

@@ -30,8 +30,8 @@ export interface EventType {
     type: 'weekly' | 'specific';
     weeklyDays: boolean[];
     specificDays?: monthDay[];
-    beginTime: number;
-    endTime: number;
+    beginTime: string;
+    endTime: string;
     timeZone?: string;
     blendMatrix: personAvailability[];
 }

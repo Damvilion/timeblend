@@ -169,11 +169,6 @@ export default function Home() {
                                 minStepsBetweenThumbs={1}
                                 onChange={(val) => {
                                     setSliderValue(val);
-                                    setEventForm((prev) => ({
-                                        ...prev,
-                                        beginTime: val[0],
-                                        endTime: val[1],
-                                    }));
                                 }}
                                 step={1}>
                                 <RangeSliderTrack maxW='340px' h='7px' bg='gray.200'>

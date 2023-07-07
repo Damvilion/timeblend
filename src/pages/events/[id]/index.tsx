@@ -9,6 +9,7 @@ import { db } from '@/firebase-config';
 import { doc, getDoc } from 'firebase/firestore';
 import { EventType } from '@/types/event-model';
 import safeJsonStringify from 'safe-json-stringify';
+import WeekDayPickTime from '@/components/WeekDayPickTime/WeekDayPickTime';
 
 async function sleep(millisecond: number) {
     return new Promise((resolve) => setTimeout(resolve, millisecond));
@@ -24,7 +25,13 @@ export default function About({ eventData }: EventPageProps) {
     const [addingPerson, setAddingPerson] = useState(false);
 
     const [responseData, setResponseData] = useState(eventData);
+    const weekDayIndex = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
+    const getWeekDays = () => {
+        if (responseData === '') return;
+        const weekDays = responseData?.weeklyDateMatrix.filter((d) => d.weekDay === true);
+        return weekDays;
+    };
     if (responseData === '') {
         return (
             <Flex direction='column'>
@@ -71,7 +78,7 @@ export default function About({ eventData }: EventPageProps) {
             <Flex justify='center' direction='row' w='100%' h={['920px', '920px', '630px', '630px']} px={[0, 2, 4, 4]} bg='white'>
                 <Flex direction='column' w='100%' minW='200px' maxW='800px' h='100%' px={[0, 1, 2, 4]} py={4} borderRight='1px dashed #dcdee0' borderLeft='1px dashed #dcdee0'>
                     <Flex align={['center', 'start', 'start', 'start']} direction={['column', 'column', 'row', 'row']} w='100%'>
-                        <Flex direction='column' w='40%' minW='320px' ml={2}>
+                        <Flex direction='column' w='33%' minW='320px' ml={2}>
                             <Flex>
                                 <Flex
                                     align='center'
@@ -163,7 +170,7 @@ export default function About({ eventData }: EventPageProps) {
                                 </Flex>
                             </Flex>
                         </Flex>
-                        <Flex direction='column' w='60%' minW='350px' ml={2}>
+                        <Flex direction='column' w='66%' minW='350px' ml={0} bg='green.100'>
                             <Flex align='center' px={2}>
                                 <Text mt={4} color='#00142C' fontWeight={600}>{`0/${responseData.blendMatrix.length}`}</Text>
                                 <Flex
@@ -198,6 +205,14 @@ export default function About({ eventData }: EventPageProps) {
                                 </Flex>
                                 <Text mt={4} ml={1} color='#00142C' fontWeight={600}>{`${responseData.blendMatrix.length}/${responseData.blendMatrix.length}`}</Text>
                             </Flex>
+                            <Flex overflowX='scroll' w='430px' maxW='430px' h='320px' mt={5} mr='auto' pl='10px' bg='red.100'>
+                                    {responseData.type === 'weekly' && getWeekDays()?.map((d, i) => {
+                                        if (!d) return;
+
+                                        return <WeekDayPickTime key={i} index={i} day={weekDayIndex[i]} labelArray={responseData.labelArray} />;
+                                    })}
+                            </Flex>
+
                             <HStack mt={5} ml={5}>
                                 <PiFunnelBold color='#818181' fontWeight={600} fontSize='15.5pt' />
                                 <Text color='#818181' fontSize='15pt' fontWeight={600}>

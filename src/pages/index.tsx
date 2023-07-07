@@ -3,7 +3,7 @@ import { Button, Flex, HStack, Input, Menu, MenuButton, MenuItem, MenuList, Rang
 import { FiChevronDown } from 'react-icons/fi';
 import ReactCalendar from '@/components/Calendar/ReactCalendar';
 import WeeklySelect from '@/components/WeeklySelect/WeeklySelect';
-import { EventType } from '@/types/event-model';
+import { EventType, weeklyDateMatrixDay } from '@/types/event-model';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/firebase-config';
 import { useRouter } from 'next/router';
@@ -12,6 +12,7 @@ export default function Home() {
     const [sliderValue, setSliderValue] = useState([9, 17]);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [formCreated, setFormCreated] = useState(false);
 
     const router = useRouter();
 
@@ -28,18 +29,20 @@ export default function Home() {
         id: generateRandomString(),
         title: '',
         type: 'specific',
-        weeklyDays: [false, false, false, false, false, false, false],
         specificDays: [],
         beginTime: '9AM',
         endTime: '5PM',
         blendMatrix: [],
+        numResponses: 0,
+        weeklyDateMatrix: [{weekDay: false, timedResponses: []}, {weekDay: false, timedResponses: []}, {weekDay: false, timedResponses: []}, {weekDay: false, timedResponses: []}, {weekDay: false, timedResponses: []}, {weekDay: false, timedResponses: []}, {weekDay: false, timedResponses: []}],
+        labelArray: [],
     });
 
     useEffect(() => {
         setEventForm((prev) => ({
             ...prev,
-            beginTime: sliderValue[0] < 12 || sliderValue[0] === 24 ? `${(sliderValue[0] % 12 === 0 ? 12 : sliderValue[0] % 12).toString()}AM` : `${(sliderValue[0] % 12 === 0 ? 12 : sliderValue[0] % 12).toString()}PM`,
-            endTime: sliderValue[1] < 12 || sliderValue[1] === 24 ? `${(sliderValue[1] % 12 === 0 ? 12 : sliderValue[1] % 12).toString()}AM` : `${(sliderValue[1] % 12 === 0 ? 12 : sliderValue[1] % 12).toString()}PM`
+            beginTime: `${sliderValue[0].toString()}`,
+            endTime: `${sliderValue[1].toString()}`
         }));
     }, [sliderValue]);
 
@@ -59,11 +62,13 @@ export default function Home() {
                 id: eventForm.id,
                 title: eventForm.title,
                 type: eventForm.type,
-                weeklyDays: eventForm.weeklyDays,
                 specificDays: eventForm.specificDays,
+                weeklyDateMatrix: eventForm.weeklyDateMatrix,
                 blendMatrix: eventForm.blendMatrix,
                 beginTime: eventForm.beginTime,
                 endTime: eventForm.endTime,
+                numResponses: eventForm.numResponses,
+                labelArray: eventForm.labelArray,
             });
             console.log('Success');
             router.push(`/events/${eventForm.id}`);
@@ -93,19 +98,58 @@ export default function Home() {
     const onSubmit = () => {
         setError('');
         setLoading(true);
+        
         if (eventForm.title === '') {
             setError('Please enter an event Title');
             setLoading(false);
             return;
         }
 
-        if (eventForm.type === 'weekly' && eventForm.weeklyDays.filter((d) => d === true).length === 0) {
+        if (eventForm.type === 'weekly' && eventForm.weeklyDateMatrix.filter((d) => d.weekDay === true).length === 0) {
             setError('Please select at least 1 week day.');
             setLoading(false);
             return;
         }
-        createDoc();
+        generateLabels();
     };
+
+    const generateLabels = () => {
+        const intArray = [];
+        const newWeeklyDateMatrix3: weeklyDateMatrixDay[] = eventForm.weeklyDateMatrix;
+        for (let i = Number(eventForm.beginTime); i <= Number(eventForm.endTime); i++) {
+            intArray.push(i);
+            // add 4 entries for each 15 minutes on each day for each hour
+            for (let j = 0; j < 7; j++) {
+                if (eventForm.weeklyDateMatrix[j].weekDay === false) continue;
+                console.log('testy');
+                const updatedTimedResponses = [...newWeeklyDateMatrix3[j].timedResponses, {names: [], numTimeResponses: 0}, {names: [], numTimeResponses: 0}, {names: [], numTimeResponses: 0}, {names: [], numTimeResponses: 0}];
+                newWeeklyDateMatrix3[j].timedResponses = updatedTimedResponses;
+                
+            }
+        }
+
+        setEventForm((prev: EventType) => ({
+            ...prev,
+            weeklyDateMatrix: newWeeklyDateMatrix3,
+        }));
+
+        // generate labels from numbers
+        const labelArray = intArray.map((militaryTime) => militaryTime >= 12 && militaryTime < 24 ? (militaryTime === 12 ? '12PM' : `${militaryTime % 12}PM`) : (militaryTime === 24 ? '12AM' : `${militaryTime}AM`) );
+
+        setEventForm((prev: EventType) => ({
+            ...prev,
+            labelArray: labelArray,
+        }));
+
+        setFormCreated(true);
+
+    };
+
+    useEffect(() => {
+        if (formCreated === true) {
+            createDoc();
+        }
+    }, [formCreated]);
 
     return (
         <Flex direction='column' w='100%' h='100%'>
@@ -278,7 +322,8 @@ export default function Home() {
                                 {eventForm.type === 'weekly' && <WeeklySelect eventForm={eventForm} setEventForm={setEventForm} />}
                             </Flex>
                             <Text ml={[2, 10, 2, 2]} color='#717171' fontSize='11.5pt'>
-                                Click and drag to select date ranges.
+                                {eventForm.type === 'weekly' && 'Click and drag to select date ranges'}
+                                {eventForm.type === 'specific' && 'Click on specific days to add to the event'}           
                             </Text>
                         </Flex>
                     </Flex>
@@ -330,7 +375,7 @@ export default function Home() {
                         onClick={() => {
                             onSubmit();
                         }}>
-                        <Button color='#625BF8' fontSize='16pt' fontWeight={600} isLoading={loading}>
+                        <Button color='#625BF8' fontSize='16pt' fontWeight={600} bg='none' _hover={{bg: 'none'}} isLoading={loading}>
                             Create Event +
                         </Button>
                     </Flex>

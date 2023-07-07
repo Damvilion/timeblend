@@ -24,16 +24,33 @@ interface personAvailability {
     specificDateTimes: specificDate[];
 }
 
+// blend matrix
+// timedResponses length = Endtime-Starttime hours * 4 15 minute intervals
+//  [weeklyDateMatrix: [{weekDay: true, timedResponses: [{numTimeResponses: 1, names: 'matt},1,1,1,0,0,1,1,0,0,1,2,2,0,0]},[false, timedResponses: []],[false, timedResponses: []],[true,[]],[false],[false],[]]
+//
+//
+
+export interface weeklyDateMatrixDayResponse {
+    names: string[],
+    numTimeResponses: number;
+}
+
+export interface weeklyDateMatrixDay {
+    weekDay: boolean;
+    timedResponses: weeklyDateMatrixDayResponse[];
+}
+
 export interface EventType {
     id: string;
     title: string;
     type: 'weekly' | 'specific';
-    weeklyDays: boolean[];
     specificDays?: monthDay[];
     beginTime: string;
     endTime: string;
-    timeZone?: string;
     blendMatrix: personAvailability[];
+    weeklyDateMatrix: weeklyDateMatrixDay[];
+    numResponses: number;
+    labelArray: string[];
 }
 
 //

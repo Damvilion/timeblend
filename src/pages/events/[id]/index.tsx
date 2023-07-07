@@ -170,7 +170,7 @@ export default function About({ eventData }: EventPageProps) {
                                 </Flex>
                             </Flex>
                         </Flex>
-                        <Flex direction='column' w='66%' minW='350px' ml={0} bg='green.100'>
+                        <Flex direction='column' w='66%' minW='350px' ml={0}>
                             <Flex align='center' px={2}>
                                 <Text mt={4} color='#00142C' fontWeight={600}>{`0/${responseData.blendMatrix.length}`}</Text>
                                 <Flex
@@ -205,12 +205,21 @@ export default function About({ eventData }: EventPageProps) {
                                 </Flex>
                                 <Text mt={4} ml={1} color='#00142C' fontWeight={600}>{`${responseData.blendMatrix.length}/${responseData.blendMatrix.length}`}</Text>
                             </Flex>
-                            <Flex overflowX='scroll' w='430px' maxW='430px' h='320px' mt={5} mr='auto' pl='10px' bg='red.100'>
-                                    {responseData.type === 'weekly' && getWeekDays()?.map((d, i) => {
-                                        if (!d) return;
-
-                                        return <WeekDayPickTime key={i} index={i} day={weekDayIndex[i]} labelArray={responseData.labelArray} />;
+                            <Flex>
+                                <Flex direction='column' w='50px' mt='52.5px'>
+                                    {responseData.labelArray.map((l, i) => {
+                                        return (
+                                            <Text key={i} mt='18.3px' color='#00142C' fontSize='13px' fontWeight={600} textAlign='right'>{l}</Text>
+                                        );
                                     })}
+                                </Flex>
+                                <Flex overflowY='scroll' w='430px' maxW='430px' mt={5} mr='auto' pl='10px'>
+                                        {responseData.type === 'weekly' && responseData.weeklyDateMatrix.map((d, i) => {
+                                            if (d.weekDay === false) return;
+
+                                            return <WeekDayPickTime index={i} key={i} weekDayMatrix={d.timedResponses} />;
+                                        })}
+                                </Flex>
                             </Flex>
 
                             <HStack mt={5} ml={5}>

@@ -116,7 +116,7 @@ export default function Home() {
     const generateLabels = () => {
         const intArray = [];
         const newWeeklyDateMatrix3: weeklyDateMatrixDay[] = eventForm.weeklyDateMatrix;
-        for (let i = Number(eventForm.beginTime); i <= Number(eventForm.endTime); i++) {
+        for (let i = Number(eventForm.beginTime); i < Number(eventForm.endTime); i++) {
             intArray.push(i);
             // add 4 entries for each 15 minutes on each day for each hour
             for (let j = 0; j < 7; j++) {
@@ -127,6 +127,7 @@ export default function Home() {
                 
             }
         }
+        intArray.push(Number(eventForm.endTime));
 
         setEventForm((prev: EventType) => ({
             ...prev,

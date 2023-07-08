@@ -1,20 +1,38 @@
 import React, { useState } from 'react';
 import { Flex, Text } from '@chakra-ui/react';
-import { weeklyDateMatrixDayResponse } from '@/types/event-model';
+import { weeklyDateMatrixDay, weeklyDateMatrixDayResponse } from '@/types/event-model';
 import IndividualWeekDayTime from '../IndividualWeekDayTime.tsx/IndividualWeekDayTime';
 
 interface WeekDayPickTimeProps {
     index: number;
+    name: string;
+    names: string[];
+    hoverIndex: number;
+    setHoverIndex: React.Dispatch<React.SetStateAction<number>>;
+    inspectCollab: number;
+    setInspectCollab: React.Dispatch<React.SetStateAction<number>>;
+    respondMode: 'DEFAULT' | 'USER' | 'USERWITHNAME';
     weekDayMatrix: weeklyDateMatrixDayResponse[];
     clickState: boolean;
-    setClickState: React.Dispatch<React.SetStateAction<boolean>>
+    setClickState: React.Dispatch<React.SetStateAction<boolean>>;
+    clientWeeklyDateMatrix: weeklyDateMatrixDay[]
+    setClientWeeklyDateMatrix: React.Dispatch<React.SetStateAction<weeklyDateMatrixDay[]>>
 }
 
 const WeekDayPickTime = ({
     index,
+    name,
+    names,
+    hoverIndex,
+    setHoverIndex,
+    inspectCollab,
+    setInspectCollab,
+    respondMode,
     weekDayMatrix,
     clickState,
     setClickState,
+    clientWeeklyDateMatrix,
+    setClientWeeklyDateMatrix,
 }: WeekDayPickTimeProps) => {
     
     const [hours, setHours] = useState(0);
@@ -29,7 +47,7 @@ const WeekDayPickTime = ({
            </Flex>
            {weekDayMatrix.map((t, i) => {
                 return (
-                    <IndividualWeekDayTime key={i} i={i} clickState={clickState} setClickState={setClickState} weekDayMatrix={weekDayMatrix} />
+                    <IndividualWeekDayTime setInspectCollab={setInspectCollab} inspectCollab={inspectCollab} hoverIndex={hoverIndex} setHoverIndex={setHoverIndex} name={name} names={names} respondMode={respondMode} key={i} i={i} dayIndex={index} clickState={clickState} setClickState={setClickState} clientWeeklyDateMatrix={clientWeeklyDateMatrix} setClientWeeklyDateMatrix={setClientWeeklyDateMatrix} />
                 );
            })}
         </Flex>

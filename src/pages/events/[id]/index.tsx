@@ -22,26 +22,25 @@ interface EventPageProps {
 
 export default function About({ eventData, eventExists }: EventPageProps) {
     const router = useRouter();
-    const [respondMode, setRespondMode] = useState(false);
+    const [respondMode, setRespondMode] = useState<'DEFAULT' | 'USER' | 'USERWITHNAME'>('DEFAULT');
     const [inviteText, setInviteText] = useState('Invite');
-    const [addingPerson, setAddingPerson] = useState(false);
+    const [addingPerson, setAddingPerson] = useState<'RESPOND' | 'CANCEL' | 'DONE'>('RESPOND');
     const [saving, setSaving] = useState(false);
     const [displaySaving, setDisplaySaving] = useState(false);
     const [name, setName] = useState('');
     const [error, setError] = useState('');
+    const [inspectCollab, setInspectCollab] = useState(-1);
+
+    // used to view time in cal by responses
+    const [hoverIndex, setHoverIndex] = useState(-1);
 
     const [clickState, setClickState] = useState(false);
 
     const [responseData, setResponseData] = useState(eventData);
+    const [clientWeeklyDateMatrix, setClientWeeklyDateMatrix] = useState(responseData.weeklyDateMatrix);
 
     const [names, setNames] = useState<string[]>(responseData.names);
 
-    const weekDayIndex = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-    const getWeekDays = () => {
-        const weekDays = responseData?.weeklyDateMatrix.filter((d) => d.weekDay === true);
-        return weekDays;
-    };
     if (eventExists === false) {
         return (
             <Flex direction='column'>
@@ -72,13 +71,36 @@ export default function About({ eventData, eventExists }: EventPageProps) {
         setInviteText('Invite');
     };
 
-    const onRespond = () => {
+    const onDone = async () => {
+        setError('');
+        setDisplaySaving(true);
+        setSaving(true);
+
+        const eventDocRef = doc(db, 'Events', responseData.id);
+        await updateDoc(eventDocRef, {
+            weeklyDateMatrix: clientWeeklyDateMatrix,
+        });
+
+        setAddingPerson('RESPOND');
+        setRespondMode('DEFAULT');
+    };
+
+    const onRespond = async () => {
         // update doc name array with new person
         // update weeklyMatrix
         // display saving state
         setError('');
-        setRespondMode(!respondMode);
-        setAddingPerson(!addingPerson);
+        setName('');
+        
+        if (addingPerson === 'CANCEL') {
+            setRespondMode('DEFAULT');
+            setAddingPerson('RESPOND');
+        } else if (addingPerson === 'RESPOND') {
+            setRespondMode('USER');
+            setAddingPerson('CANCEL');
+        } else {
+            await onDone();
+        }
         setDisplaySaving(false);
         setSaving(false);
         
@@ -102,6 +124,8 @@ export default function About({ eventData, eventExists }: EventPageProps) {
             setNames([name]);
         }
 
+        setAddingPerson('DONE');
+        setRespondMode('USERWITHNAME');
         setSaving(true);
         setDisplaySaving(true);
         
@@ -122,6 +146,49 @@ export default function About({ eventData, eventExists }: EventPageProps) {
 
         console.log(name);
 
+    };
+
+    const getTimeFromIndex = (sliceIndex: number) => {
+
+        const timeString = responseData.labelArray[parseInt((sliceIndex/4).toString())];
+        const endTimeString = responseData.labelArray[parseInt(((sliceIndex/4) + 1).toString())];
+
+        let isAM = true;
+        let isEndAM = true;
+
+        let baseTime = '';
+        let endBaseTime = '';
+        if (timeString[timeString.length - 2] === 'A') {
+            baseTime = timeString.split('A')[0];
+            if (endTimeString[endTimeString.length - 2] === 'A') {
+                endBaseTime = endTimeString.split('A')[0];
+            } else {
+                endBaseTime = endTimeString.split('P')[0];
+                isEndAM = false;
+            }
+        } else {
+            baseTime = timeString.split('P')[0];
+            isAM = false;
+            if (endTimeString[endTimeString.length - 2] === 'A') {
+                endBaseTime = endTimeString.split('A')[0];
+            } else {
+                endBaseTime = endTimeString.split('P')[0];
+                isEndAM = false;
+            }
+        }
+
+        // const baseTime = responseData.labelArray[sliceIndex/4].split();
+        const whereNum = (Math.round(parseFloat((sliceIndex/4).toFixed(2)) * 100) / 100).toFixed(2);
+
+        if (whereNum[whereNum.length-2] === '0') {
+            return `${baseTime.slice(0,-1)}:00 ${isAM ? 'AM' : 'PM'} - ${baseTime.slice(0,-1)}:15 ${isAM ? 'AM' : 'PM'}`;
+        } else if (whereNum[whereNum.length-2] === '2') {
+            return `${baseTime.slice(0,-1)}:15 ${isAM ? 'AM' : 'PM'} - ${baseTime.slice(0,-1)}:30 ${isAM ? 'AM' : 'PM'}`;
+        } else if (whereNum[whereNum.length-2] === '5') {
+            return `${baseTime.slice(0,-1)}:30 ${isAM ? 'AM' : 'PM'} - ${baseTime.slice(0,-1)}:45 ${isAM ? 'AM' : 'PM'}`;
+        } else {
+            return `${baseTime.slice(0,-1)}:45 ${isAM ? 'AM' : 'PM'} - ${endBaseTime.slice(0,-1)}:00 ${isEndAM ? 'AM' : 'PM'}`;
+        }
     };
 
     return (
@@ -154,10 +221,13 @@ export default function About({ eventData, eventExists }: EventPageProps) {
                                     onClick={onRespond}
                                     >
                                     <HStack>
-                                        {addingPerson === true && <HiOutlineArrowSmLeft color='#625BF8' fontSize='18pt' />}
-                                        {addingPerson === false && <PiCalendarPlusBold color='#625BF8' fontSize='18pt' />}
+                                        {addingPerson === 'CANCEL' && <HiOutlineArrowSmLeft color='#625BF8' fontSize='18pt' />}
+                                        {addingPerson === 'RESPOND' && <PiCalendarPlusBold color='#625BF8' fontSize='18pt' />}
+                                        {addingPerson === 'DONE' && <BsCheckLg color='#625BF8' fontSize='18pt' />}
                                         <Text color='#625BF8' fontSize='16pt' fontWeight={600}>
-                                            {addingPerson ? 'Cancel' : 'Respond'}
+                                            {addingPerson === 'CANCEL' && 'Cancel'}
+                                            {addingPerson === 'RESPOND' && 'Respond'}
+                                            {addingPerson === 'DONE' && 'Done'}
                                         </Text>
                                     </HStack>
                                 </Flex>
@@ -187,10 +257,10 @@ export default function About({ eventData, eventExists }: EventPageProps) {
                                 </Flex>
                             </Flex>
                             
-                            <HStack mt={5} ml={5}>
+                            <HStack align='center' h='26px' mt={5} ml={5}>
                                 <PiFunnelBold color='#818181' fontWeight={600} fontSize='15.5pt' />
-                                <Text color='#818181' fontSize='15pt' fontWeight={600}>
-                                    Responses
+                                <Text color='#818181' fontSize={hoverIndex === -1 ? '15pt' : '13.5pt'} fontWeight={600}>
+                                    {hoverIndex === -1 ? 'Responses' : getTimeFromIndex(hoverIndex)}
                                 </Text>
                                 <Text mt={1} color='lightgray' fontSize='12pt' fontWeight={600}>
                                     {displaySaving && saving && 'Auto Saving...'}
@@ -199,7 +269,7 @@ export default function About({ eventData, eventExists }: EventPageProps) {
                             </HStack>
                             
                             <Flex direction='column' mt={3} ml='22px'>
-                            {respondMode && 
+                            {respondMode === 'USER' && 
                                 <Flex align='center' mb={3.5}>
                                     <Input
                                         maxW='165px'
@@ -218,6 +288,7 @@ export default function About({ eventData, eventExists }: EventPageProps) {
                                         onChange={(event) => setName(event.target.value)}
                                         placeholder='Name'
                                         spellCheck='false'
+                                        value={name}
                                     />
                                     <Flex align='center' justify='center' w='28.5px' h='28.5px' ml={2.5} bg='#625BF8' _hover={{ cursor: 'pointer', bg: '#8983fc' }} onClick={onSubmitResponse}>
                                         <BsCheckLg fontSize='20px' />
@@ -229,9 +300,9 @@ export default function About({ eventData, eventExists }: EventPageProps) {
                                     {names?.map((n, i) => {
                                         return (
                                             <Flex key={i} align='center' mt={1.5}>
-                                                <Checkbox w='20px' h='20px' p={0} borderColor='#D3D3D3' borderRadius={3} colorScheme='twitter' size='lg' />
+                                                <Checkbox w='20px' h='20px' p={0} borderColor='#D3D3D3' borderRadius={3} colorScheme='twitter' defaultChecked={n === name} disabled={respondMode === 'USERWITHNAME' && n !== name || respondMode === 'USER' && n !== name} size='lg' />
                                                 <Text ml={2.5} color='#00132C' fontSize='15pt' fontWeight={600}>
-                                                    {n}
+                                                    {n.charAt(0).toUpperCase() + n.slice(1)}
                                                 </Text>
                                             </Flex>
                                         );
@@ -240,8 +311,8 @@ export default function About({ eventData, eventExists }: EventPageProps) {
                             </Flex>
                         </Flex>
                         <Flex direction='column' w='66%' minW='350px' ml={0}>
-                            <Flex align='center' px={2}>
-                                <Text mt={4} color='#00142C' fontWeight={600}>{`0/${responseData.blendMatrix.length}`}</Text>
+                            <Flex align='center' px={6}>
+                                <Text mt={4} color='#00142C' fontWeight={600}>{`0/${names.length}`}</Text>
                                 <Flex
                                     align='center'
                                     justify='center'
@@ -252,27 +323,32 @@ export default function About({ eventData, eventExists }: EventPageProps) {
                                     ml={2}
                                     px={3}
                                     bg='#E6E7F9'
+                                    
                                     borderRadius={5}
                                     shadow='0 7px 14px rgba(50, 50, 93, 0.08), 0 3px 2px rgba(0, 0, 0, 0.06);'
-                                    _hover={{ transform: 'translateY(-1px)', bg: '#ebecfc', cursor: 'pointer', boxShadow: '0 7px 14px rgba(50, 50, 93, 0.08), 0 3px 2px rgba(0, 0, 0, 0.06);' }}>
+                                    _hover={{ transform: 'translateY(-1px)', bg: '#ebecfc', cursor: 'pointer', boxShadow: '0 7px 14px rgba(50, 50, 93, 0.08), 0 3px 2px rgba(0, 0, 0, 0.06);' }}
+                                    onMouseLeave={() => setInspectCollab(-1)}>
                                     <HStack h='100%' spacing={0}>
-                                        {responseData.blendMatrix.map((r, i) => {
+                                        {['white', ...names].map((r, i) => {
                                             return (
                                                 <Flex
-                                                    key={r.personName}
+                                                    key={i}
                                                     align='center'
                                                     justify='center'
-                                                    w={`${270 / responseData.blendMatrix.length}px`}
+                                                    w={`${270 / (names.length + 1)}px`}
                                                     h='100%'
-                                                    bg='#8983FC'
-                                                    opacity={i / (responseData.blendMatrix.length - 1)}
-                                                    borderRightRadius={i === responseData.blendMatrix.length - 1 ? 5 : 0}
+                                                    bg={names.length === 0 ? '#E6E7F8' : '#625BF8'}
+                                                    opacity={i / (names.length)}
+                                                    borderRightRadius={i === names.length ? 5 : 0}
+                                                    borderLeftRadius={names.length === 0 ? 5 : 0}
+                                                    onMouseEnter={() => setInspectCollab(i)}
+                                                    onMouseOver={() => setInspectCollab(i)}
                                                 />
                                             );
                                         })}
                                     </HStack>
                                 </Flex>
-                                <Text mt={4} ml={1} color='#00142C' fontWeight={600}>{`${responseData.blendMatrix.length}/${responseData.blendMatrix.length}`}</Text>
+                                <Text mt={4} ml={1} color='#00142C' fontWeight={600}>{`${names.length}/${names.length}`}</Text>
                             </Flex>
                             <Flex>
                                 <Flex direction='column' w='50px' mt='52.5px'>
@@ -282,11 +358,11 @@ export default function About({ eventData, eventExists }: EventPageProps) {
                                         );
                                     })}
                                 </Flex>
-                                <Flex overflowY='scroll' maxW='430px' mt={5} mr='auto' ml={2} pl={0} onMouseLeave={() => setClickState(false)} onMouseUp={() => setClickState(false)}>
-                                        {responseData.type === 'weekly' && responseData.weeklyDateMatrix.map((d, i) => {
+                                <Flex overflowY='scroll' maxW='430px' mt={5} mr='auto' ml={2} pl={0} onMouseLeave={() => {setClickState(false); setHoverIndex(-1);}} onMouseUp={() => setClickState(false)}>
+                                        {responseData.type === 'weekly' && clientWeeklyDateMatrix.map((d, i) => {
                                             if (d.weekDay === false) return;
 
-                                            return <WeekDayPickTime index={i} key={i} clickState={clickState} setClickState={setClickState} weekDayMatrix={d.timedResponses} />;
+                                            return <WeekDayPickTime inspectCollab={inspectCollab} setInspectCollab={setInspectCollab} hoverIndex={hoverIndex} setHoverIndex={setHoverIndex} name={name} names={names} respondMode={respondMode} index={i} key={i} clickState={clickState} setClickState={setClickState} weekDayMatrix={d.timedResponses} clientWeeklyDateMatrix={clientWeeklyDateMatrix} setClientWeeklyDateMatrix={setClientWeeklyDateMatrix} />;
                                         })}
                                 </Flex>
                             </Flex>

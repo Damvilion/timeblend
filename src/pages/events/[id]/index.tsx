@@ -6,7 +6,7 @@ import { PiCalendarPlusBold, PiFunnelBold } from 'react-icons/pi';
 import { BsCheckLg, BsLink } from 'react-icons/bs';
 import { HiOutlineArrowSmLeft } from 'react-icons/hi';
 import { db } from '@/firebase-config';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { EventType } from '@/types/event-model';
 import safeJsonStringify from 'safe-json-stringify';
 import WeekDayPickTime from '@/components/WeekDayPickTime/WeekDayPickTime';
@@ -16,23 +16,33 @@ async function sleep(millisecond: number) {
 }
 
 interface EventPageProps {
-    eventData: EventType | '';
+    eventData: EventType;
+    eventExists: boolean;
 }
 
-export default function About({ eventData }: EventPageProps) {
+export default function About({ eventData, eventExists }: EventPageProps) {
     const router = useRouter();
+    const [respondMode, setRespondMode] = useState(false);
     const [inviteText, setInviteText] = useState('Invite');
     const [addingPerson, setAddingPerson] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [displaySaving, setDisplaySaving] = useState(false);
+    const [name, setName] = useState('');
+    const [error, setError] = useState('');
+
+    const [clickState, setClickState] = useState(false);
 
     const [responseData, setResponseData] = useState(eventData);
+
+    const [names, setNames] = useState<string[]>(responseData.names);
+
     const weekDayIndex = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
     const getWeekDays = () => {
-        if (responseData === '') return;
         const weekDays = responseData?.weeklyDateMatrix.filter((d) => d.weekDay === true);
         return weekDays;
     };
-    if (responseData === '') {
+    if (eventExists === false) {
         return (
             <Flex direction='column'>
                 <Flex justify='center' direction='row' w='100%' h='140px' px={[2, 4, 5, 5]} bg='#F4F7F9' borderBottom='1px dashed #dcdee0'>
@@ -63,7 +73,55 @@ export default function About({ eventData }: EventPageProps) {
     };
 
     const onRespond = () => {
+        // update doc name array with new person
+        // update weeklyMatrix
+        // display saving state
+        setError('');
+        setRespondMode(!respondMode);
         setAddingPerson(!addingPerson);
+        setDisplaySaving(false);
+        setSaving(false);
+        
+    };
+
+    const onSubmitResponse = async () => {
+        setError('');
+        if (name === '') {
+            setError('Please enter a name');
+            return;
+        }
+
+        // add name to client names
+        if (names && names.length > 0) {
+            if (names.includes(name)) {
+                setError('Name already exists');
+                return;
+            }
+            setNames([...names, name]);
+        } else {
+            setNames([name]);
+        }
+
+        setSaving(true);
+        setDisplaySaving(true);
+        
+        // add name to firestore
+        const eventDocRef = doc(db, 'Events', responseData.id);
+        
+        if (names && names.length > 0) {
+            await updateDoc(eventDocRef, {
+                names: [...names, name]
+            });
+        } else {
+            await updateDoc(eventDocRef, {
+                names: [name]
+            });
+        }
+        
+        setSaving(false);
+
+        console.log(name);
+
     };
 
     return (
@@ -128,13 +186,20 @@ export default function About({ eventData }: EventPageProps) {
                                     </HStack>
                                 </Flex>
                             </Flex>
+                            
                             <HStack mt={5} ml={5}>
                                 <PiFunnelBold color='#818181' fontWeight={600} fontSize='15.5pt' />
                                 <Text color='#818181' fontSize='15pt' fontWeight={600}>
                                     Responses
                                 </Text>
+                                <Text mt={1} color='lightgray' fontSize='12pt' fontWeight={600}>
+                                    {displaySaving && saving && 'Auto Saving...'}
+                                    {displaySaving && !saving && 'Saved.'}
+                                </Text>
                             </HStack>
+                            
                             <Flex direction='column' mt={3} ml='22px'>
+                            {respondMode && 
                                 <Flex align='center' mb={3.5}>
                                     <Input
                                         maxW='165px'
@@ -149,24 +214,28 @@ export default function About({ eventData }: EventPageProps) {
                                         _hover={{ border: '2px solid #7A84E8' }}
                                         _focus={{ boxShadow: 'none', outline: 'none', border: '2px solid #7A84E8' }}
                                         _placeholder={{ color: 'gray' }}
+                                        maxLength={18}
+                                        onChange={(event) => setName(event.target.value)}
                                         placeholder='Name'
                                         spellCheck='false'
                                     />
-                                    <Flex align='center' justify='center' w='28.5px' h='28.5px' ml={2.5} bg='#625BF8' _hover={{ cursor: 'pointer', bg: '#8983fc' }}>
+                                    <Flex align='center' justify='center' w='28.5px' h='28.5px' ml={2.5} bg='#625BF8' _hover={{ cursor: 'pointer', bg: '#8983fc' }} onClick={onSubmitResponse}>
                                         <BsCheckLg fontSize='20px' />
                                     </Flex>
                                 </Flex>
-                                <Flex align='center' mt={1.5}>
-                                    <Checkbox w='20px' h='20px' p={0} borderColor='#D3D3D3' borderRadius={3} colorScheme='twitter' size='lg' />
-                                    <Text ml={2.5} color='#00132C' fontSize='15pt' fontWeight={600}>
-                                        Matt
-                                    </Text>
-                                </Flex>
-                                <Flex align='center' mt={1.5}>
-                                    <Checkbox w='20px' h='20px' p={0} borderColor='#D3D3D3' borderRadius={3} colorScheme='twitter' size='lg' />
-                                    <Text ml={2.5} color='#00132C' fontSize='15pt' fontWeight={600}>
-                                        Matt
-                                    </Text>
+                                }
+                                {error && <Text mt={-3} mb="-12px" ml={0} color='red.300' fontWeight={600}>{error}</Text>}
+                                <Flex direction='column' mt={2}>
+                                    {names?.map((n, i) => {
+                                        return (
+                                            <Flex key={i} align='center' mt={1.5}>
+                                                <Checkbox w='20px' h='20px' p={0} borderColor='#D3D3D3' borderRadius={3} colorScheme='twitter' size='lg' />
+                                                <Text ml={2.5} color='#00132C' fontSize='15pt' fontWeight={600}>
+                                                    {n}
+                                                </Text>
+                                            </Flex>
+                                        );
+                                    })}
                                 </Flex>
                             </Flex>
                         </Flex>
@@ -213,56 +282,15 @@ export default function About({ eventData }: EventPageProps) {
                                         );
                                     })}
                                 </Flex>
-                                <Flex overflowY='scroll' w='430px' maxW='430px' mt={5} mr='auto' pl='10px'>
+                                <Flex overflowY='scroll' maxW='430px' mt={5} mr='auto' ml={2} pl={0} onMouseLeave={() => setClickState(false)} onMouseUp={() => setClickState(false)}>
                                         {responseData.type === 'weekly' && responseData.weeklyDateMatrix.map((d, i) => {
                                             if (d.weekDay === false) return;
 
-                                            return <WeekDayPickTime index={i} key={i} weekDayMatrix={d.timedResponses} />;
+                                            return <WeekDayPickTime index={i} key={i} clickState={clickState} setClickState={setClickState} weekDayMatrix={d.timedResponses} />;
                                         })}
                                 </Flex>
                             </Flex>
-
-                            <HStack mt={5} ml={5}>
-                                <PiFunnelBold color='#818181' fontWeight={600} fontSize='15.5pt' />
-                                <Text color='#818181' fontSize='15pt' fontWeight={600}>
-                                    Responses
-                                </Text>
-                            </HStack>
-                            <Flex direction='column' mt={3} ml='22px'>
-                                <Flex align='center' mb={3.5}>
-                                    <Input
-                                        maxW='165px'
-                                        h='32px'
-                                        px={2}
-                                        color='#00142C'
-                                        fontSize='13pt'
-                                        fontWeight={600}
-                                        bg='#F4F7F9'
-                                        border='2px solid lightgray'
-                                        borderRadius={2}
-                                        _hover={{ border: '2px solid #7A84E8' }}
-                                        _focus={{ boxShadow: 'none', outline: 'none', border: '2px solid #7A84E8' }}
-                                        _placeholder={{ color: 'gray' }}
-                                        placeholder='Name'
-                                        spellCheck='false'
-                                    />
-                                    <Flex align='center' justify='center' w='28.5px' h='28.5px' ml={2.5} bg='#625BF8' _hover={{ cursor: 'pointer', bg: '#8983fc' }}>
-                                        <BsCheckLg fontSize='20px' />
-                                    </Flex>
-                                </Flex>
-                                <Flex align='center' mt={1.5}>
-                                    <Checkbox w='20px' h='20px' p={0} borderColor='#D3D3D3' borderRadius={3} colorScheme='twitter' size='lg' />
-                                    <Text ml={2.5} color='#00132C' fontSize='15pt' fontWeight={600}>
-                                        Matt
-                                    </Text>
-                                </Flex>
-                                <Flex align='center' mt={1.5}>
-                                    <Checkbox w='20px' h='20px' p={0} borderColor='#D3D3D3' borderRadius={3} colorScheme='twitter' size='lg' />
-                                    <Text ml={2.5} color='#00132C' fontSize='15pt' fontWeight={600}>
-                                        Matt
-                                    </Text>
-                                </Flex>
-                            </Flex>
+                            
                         </Flex>
                     </Flex>
                 </Flex>
@@ -278,9 +306,23 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         const eventDocRef = doc(db, 'Events', context.query.id as string);
         const eventDoc = await getDoc(eventDocRef);
 
+        const nullData = {
+            id: '',
+            title: '',
+            type: 'weekly',
+            specificDays: [],
+            beginTime: '',
+            endTime: '',
+            blendMatrix: [],
+            weeklyDateMatrix: [],
+            names: [],
+            labelArray: [],
+        };
+
         return {
             props: {
-                eventData: eventDoc.exists() ? JSON.parse(safeJsonStringify(eventDoc.data())) : '',
+                eventExists: eventDoc.exists(),
+                eventData:  eventDoc.exists() ? JSON.parse(safeJsonStringify(eventDoc.data())) : nullData,
             },
         };
     } catch (error) {

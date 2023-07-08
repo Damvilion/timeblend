@@ -49,7 +49,7 @@ export interface EventType {
     endTime: string;
     blendMatrix: personAvailability[];
     weeklyDateMatrix: weeklyDateMatrixDay[];
-    numResponses: number;
+    names: string[];
     labelArray: string[];
 }
 

@@ -33,7 +33,7 @@ export default function Home() {
         beginTime: '9AM',
         endTime: '5PM',
         blendMatrix: [],
-        numResponses: 0,
+        names: [],
         weeklyDateMatrix: [{weekDay: false, timedResponses: []}, {weekDay: false, timedResponses: []}, {weekDay: false, timedResponses: []}, {weekDay: false, timedResponses: []}, {weekDay: false, timedResponses: []}, {weekDay: false, timedResponses: []}, {weekDay: false, timedResponses: []}],
         labelArray: [],
     });
@@ -58,18 +58,7 @@ export default function Home() {
                 return;
             }
 
-            const res = await setDoc(doc(db, 'Events', eventForm.id), {
-                id: eventForm.id,
-                title: eventForm.title,
-                type: eventForm.type,
-                specificDays: eventForm.specificDays,
-                weeklyDateMatrix: eventForm.weeklyDateMatrix,
-                blendMatrix: eventForm.blendMatrix,
-                beginTime: eventForm.beginTime,
-                endTime: eventForm.endTime,
-                numResponses: eventForm.numResponses,
-                labelArray: eventForm.labelArray,
-            });
+            const res = await setDoc(doc(db, 'Events', eventForm.id), {...eventForm});
             console.log('Success');
             router.push(`/events/${eventForm.id}`);
         } catch (err) {
@@ -135,7 +124,7 @@ export default function Home() {
         }));
 
         // generate labels from numbers
-        const labelArray = intArray.map((militaryTime) => militaryTime >= 12 && militaryTime < 24 ? (militaryTime === 12 ? '12PM' : `${militaryTime % 12}PM`) : (militaryTime === 24 ? '12AM' : `${militaryTime}AM`) );
+        const labelArray = intArray.map((militaryTime) => militaryTime >= 12 && militaryTime < 24 ? (militaryTime === 12 ? '12 PM' : `${militaryTime % 12} PM`) : (militaryTime === 24 ? '12 AM' : `${militaryTime} AM`) );
 
         setEventForm((prev: EventType) => ({
             ...prev,

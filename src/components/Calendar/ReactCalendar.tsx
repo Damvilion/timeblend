@@ -1,5 +1,5 @@
 'use client';
-import { EventType, specificDate } from '@/types/event-model';
+import { EventType } from '@/types/event-model';
 import React from 'react';
 import { Calendar } from 'react-multi-date-picker';
 
@@ -11,42 +11,58 @@ const ReactCalendar = ({ setEventForm }: sliderValue) => {
     let info: any = [];
     const handleSelection = (value: any) => {
         // Gets the data from the calendar and makes it into an array
-        const fullValue: string[] = value.toString().split(',');
-        // Sorts the data
-        const sortedDates: string[] = fullValue.sort((a, b) => {
-            const dateA: Date = new Date(a);
-            const dateB: Date = new Date(b);
-            return dateA.getTime() - dateB.getTime();
-        });
 
-        // Sorts the value of all the dates into an object
-        const formated = () => {
-            for (const date of sortedDates) {
-                const [year, month, day] = date.split('/');
-                const newDate: specificDate = {
-                    year: year,
-                    month: month,
-                    day: day,
-                };
+        info = value.map((d: any) => {return {
+                                        numberDay: d.day, 
+                                        weekDay: d.weekDay.shortName,
+                                        month: d.month.shortName,
+                                        year: d.year,
+                                        timedResponses: []
+                                     }; });
+        console.log(info);
 
-                info.push(newDate);
+        function compareYear( a: any, b: any ) {
+            if ( a.year < b.year){
+              return -1;
             }
-        };
-        //  Resets the array then Sorts the value of all the dates into an object
-        info = [];
-        formated();
+            if ( a.year > b.year ){
+              return 1;
+            }
+            // then check month
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            if ( months.indexOf(a.month) < months.indexOf(b.month)){
+                return -1;
+            }
+            if ( months.indexOf(a.month) > months.indexOf(b.month) ){
+                return 1;
+            }
+
+            if ( Number(a.numberDay) < Number(b.numberDay)) {
+                return -1;
+            }
+            if (Number(a.numberDay) > Number(b.numberDay)) {
+                return 1;
+            }
+            
+            return 0;
+          }
+
+          info.sort(compareYear);
+
+        setEventForm((prev) => ({
+            ...prev,
+            specificDateMatrix: info,
+        }));
     };
 
     return (
         <div>
             <Calendar
+                format="YYYY,MMMM,DDDD"
                 value={null}
+                highlightToday={false}
                 onChange={(e) => {
                     handleSelection(e);
-                    setEventForm((prev) => ({
-                        ...prev,
-                        specificDays: info,
-                    }));
                 }}
                 multiple
                 range={false}

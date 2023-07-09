@@ -7,9 +7,10 @@ import { BsCheckLg, BsLink } from 'react-icons/bs';
 import { HiOutlineArrowSmLeft } from 'react-icons/hi';
 import { db } from '@/firebase-config';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { EventType } from '@/types/event-model';
+import { EventType, specificDateMatrixDay, weeklyDateMatrixDay } from '@/types/event-model';
 import safeJsonStringify from 'safe-json-stringify';
 import WeekDayPickTime from '@/components/WeekDayPickTime/WeekDayPickTime';
+import SpecificDatePickTime from '@/components/SpecificDatePickTime/SpecificDatePickTime';
 
 async function sleep(millisecond: number) {
     return new Promise((resolve) => setTimeout(resolve, millisecond));
@@ -37,7 +38,7 @@ export default function About({ eventData, eventExists }: EventPageProps) {
     const [clickState, setClickState] = useState(false);
 
     const [responseData, setResponseData] = useState(eventData);
-    const [clientWeeklyDateMatrix, setClientWeeklyDateMatrix] = useState(responseData.weeklyDateMatrix);
+    const [clientWeeklyDateMatrix, setClientWeeklyDateMatrix] = useState(responseData.type === 'weekly' ? responseData.weeklyDateMatrix : responseData.specificDateMatrix);
 
     const [names, setNames] = useState<string[]>(responseData.names);
 
@@ -77,9 +78,16 @@ export default function About({ eventData, eventExists }: EventPageProps) {
         setSaving(true);
 
         const eventDocRef = doc(db, 'Events', responseData.id);
-        await updateDoc(eventDocRef, {
-            weeklyDateMatrix: clientWeeklyDateMatrix,
-        });
+
+        if (responseData.type === 'weekly') {
+            await updateDoc(eventDocRef, {
+                weeklyDateMatrix: clientWeeklyDateMatrix,
+            });
+        } else {
+            await updateDoc(eventDocRef, {
+                specificDateMatrix: clientWeeklyDateMatrix,
+            });
+        }
 
         setAddingPerson('RESPOND');
         setRespondMode('DEFAULT');
@@ -359,10 +367,14 @@ export default function About({ eventData, eventExists }: EventPageProps) {
                                     })}
                                 </Flex>
                                 <Flex overflowY='scroll' maxW='430px' mt={5} mr='auto' ml={2} pl={0} onMouseLeave={() => {setClickState(false); setHoverIndex(-1);}} onMouseUp={() => setClickState(false)}>
+                                        
                                         {responseData.type === 'weekly' && clientWeeklyDateMatrix.map((d, i) => {
                                             if (d.weekDay === false) return;
 
-                                            return <WeekDayPickTime inspectCollab={inspectCollab} setInspectCollab={setInspectCollab} hoverIndex={hoverIndex} setHoverIndex={setHoverIndex} name={name} names={names} respondMode={respondMode} index={i} key={i} clickState={clickState} setClickState={setClickState} weekDayMatrix={d.timedResponses} clientWeeklyDateMatrix={clientWeeklyDateMatrix} setClientWeeklyDateMatrix={setClientWeeklyDateMatrix} />;
+                                            return <WeekDayPickTime inspectCollab={inspectCollab} setInspectCollab={setInspectCollab} hoverIndex={hoverIndex} setHoverIndex={setHoverIndex} name={name} names={names} respondMode={respondMode} index={i} key={i} clickState={clickState} setClickState={setClickState} weekDayMatrix={d.timedResponses} clientWeeklyDateMatrix={clientWeeklyDateMatrix as weeklyDateMatrixDay[]} setClientWeeklyDateMatrix={setClientWeeklyDateMatrix as React.Dispatch<React.SetStateAction<weeklyDateMatrixDay[]>>} />;
+                                        })}
+                                        {responseData.type ==='specific' && clientWeeklyDateMatrix.map((d,i) => {
+                                            return <SpecificDatePickTime inspectCollab={inspectCollab} setInspectCollab={setInspectCollab} hoverIndex={hoverIndex} setHoverIndex={setHoverIndex} name={name} names={names} respondMode={respondMode} index={i} key={i} clickState={clickState} setClickState={setClickState} weekDayMatrix={d.timedResponses} clientWeeklyDateMatrix={clientWeeklyDateMatrix as specificDateMatrixDay[]} setClientWeeklyDateMatrix={setClientWeeklyDateMatrix as React.Dispatch<React.SetStateAction<specificDateMatrixDay[]>>} />;
                                         })}
                                 </Flex>
                             </Flex>

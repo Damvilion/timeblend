@@ -3,7 +3,7 @@ import { Button, Flex, HStack, Input, Menu, MenuButton, MenuItem, MenuList, Rang
 import { FiChevronDown } from 'react-icons/fi';
 import ReactCalendar from '@/components/Calendar/ReactCalendar';
 import WeeklySelect from '@/components/WeeklySelect/WeeklySelect';
-import { EventType, weeklyDateMatrixDay } from '@/types/event-model';
+import { EventType, specificDateMatrixDay, weeklyDateMatrixDay } from '@/types/event-model';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/firebase-config';
 import { useRouter } from 'next/router';
@@ -29,12 +29,11 @@ export default function Home() {
         id: generateRandomString(),
         title: '',
         type: 'specific',
-        specificDays: [],
         beginTime: '9AM',
         endTime: '5PM',
-        blendMatrix: [],
         names: [],
         weeklyDateMatrix: [{weekDay: false, timedResponses: []}, {weekDay: false, timedResponses: []}, {weekDay: false, timedResponses: []}, {weekDay: false, timedResponses: []}, {weekDay: false, timedResponses: []}, {weekDay: false, timedResponses: []}, {weekDay: false, timedResponses: []}],
+        specificDateMatrix: [],
         labelArray: [],
     });
 
@@ -99,29 +98,51 @@ export default function Home() {
             setLoading(false);
             return;
         }
+
+        if (eventForm.type === 'specific' && eventForm.specificDateMatrix.length === 0) {
+            setError('Please select at least 1 date.');
+            setLoading(false);
+        }
+
         generateLabels();
     };
 
     const generateLabels = () => {
         const intArray = [];
         const newWeeklyDateMatrix3: weeklyDateMatrixDay[] = eventForm.weeklyDateMatrix;
+        const newSpecificDateMatrix3: specificDateMatrixDay[] = eventForm.specificDateMatrix;
+
         for (let i = Number(eventForm.beginTime); i < Number(eventForm.endTime); i++) {
             intArray.push(i);
             // add 4 entries for each 15 minutes on each day for each hour
-            for (let j = 0; j < 7; j++) {
-                if (eventForm.weeklyDateMatrix[j].weekDay === false) continue;
-                console.log('testy');
-                const updatedTimedResponses = [...newWeeklyDateMatrix3[j].timedResponses, {names: [], numTimeResponses: 0}, {names: [], numTimeResponses: 0}, {names: [], numTimeResponses: 0}, {names: [], numTimeResponses: 0}];
-                newWeeklyDateMatrix3[j].timedResponses = updatedTimedResponses;
-                
+            if (eventForm.type === 'weekly') {
+                for (let j = 0; j < 7; j++) {
+                    if (eventForm.weeklyDateMatrix[j].weekDay === false) continue;
+                    
+                    const updatedTimedResponses = [...newWeeklyDateMatrix3[j].timedResponses, {names: [], numTimeResponses: 0}, {names: [], numTimeResponses: 0}, {names: [], numTimeResponses: 0}, {names: [], numTimeResponses: 0}];
+                    newWeeklyDateMatrix3[j].timedResponses = updatedTimedResponses;
+                    
+                }
+            } else {
+                for (let j = 0; j < newSpecificDateMatrix3.length; j++) {
+                    const updatedTimedResponses = [...newSpecificDateMatrix3[j].timedResponses, {names: [], numTimeResponses: 0}, {names: [], numTimeResponses: 0}, {names: [], numTimeResponses: 0}, {names: [], numTimeResponses: 0}];
+                    newSpecificDateMatrix3[j].timedResponses = updatedTimedResponses;
+                }
             }
         }
         intArray.push(Number(eventForm.endTime));
 
-        setEventForm((prev: EventType) => ({
-            ...prev,
-            weeklyDateMatrix: newWeeklyDateMatrix3,
-        }));
+        if (eventForm.type === 'weekly') {
+            setEventForm((prev: EventType) => ({
+                ...prev,
+                weeklyDateMatrix: newWeeklyDateMatrix3,
+            }));
+        } else {
+            setEventForm((prev: EventType) => ({
+                ...prev,
+                specificDateMatrix: newSpecificDateMatrix3,
+            }));
+        }  
 
         // generate labels from numbers
         const labelArray = intArray.map((militaryTime) => militaryTime >= 12 && militaryTime < 24 ? (militaryTime === 12 ? '12 PM' : `${militaryTime % 12} PM`) : (militaryTime === 24 ? '12 AM' : `${militaryTime} AM`) );

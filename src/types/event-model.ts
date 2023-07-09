@@ -18,12 +18,6 @@ export interface specificDate {
     year: string;
 }
 
-interface personAvailability {
-    personName: string;
-    weeklyDateTimes: weeklyDate[];
-    specificDateTimes: specificDate[];
-}
-
 // blend matrix
 // timedResponses length = Endtime-Starttime hours * 4 15 minute intervals
 //  [weeklyDateMatrix: [{weekDay: true, timedResponses: [{numTimeResponses: 1, names: 'matt},1,1,1,0,0,1,1,0,0,1,2,2,0,0]},[false, timedResponses: []],[false, timedResponses: []],[true,[]],[false],[false],[]]
@@ -35,20 +29,37 @@ export interface weeklyDateMatrixDayResponse {
     numTimeResponses: number;
 }
 
+export interface specificDateMatrixDayResponse {
+    names: string[],
+    numTimeResponses: number;
+}
+
 export interface weeklyDateMatrixDay {
     weekDay: boolean;
     timedResponses: weeklyDateMatrixDayResponse[];
+}
+
+// blend matrix
+// timedResponses length = Endtime-Starttime hours * 4 15 minute intervals
+//  [specificDateMatrix: [{weekDay: 0, numberDay: ' timedResponses: [{numTimeResponses: 1, names: 'matt},1,1,1,0,0,1,1,0,0,1,2,2,0,0]},[false, timedResponses: []],[false, timedResponses: []],[true,[]],[false],[false],[]]
+//
+
+export interface specificDateMatrixDay {
+    weekDay: string;
+    numberDay: string;
+    month: string;
+    year: string;
+    timedResponses: specificDateMatrixDayResponse[];
 }
 
 export interface EventType {
     id: string;
     title: string;
     type: 'weekly' | 'specific';
-    specificDays?: monthDay[];
     beginTime: string;
     endTime: string;
-    blendMatrix: personAvailability[];
     weeklyDateMatrix: weeklyDateMatrixDay[];
+    specificDateMatrix: specificDateMatrixDay[];
     names: string[];
     labelArray: string[];
 }

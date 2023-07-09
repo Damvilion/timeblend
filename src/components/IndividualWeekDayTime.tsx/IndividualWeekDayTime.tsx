@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Flex } from '@chakra-ui/react';
-import { weeklyDateMatrixDay } from '@/types/event-model';
 
-interface IndividualWeekDayTimeProps {
+interface IndividualWeekDayTimeProps<T> {
     i: number;
+    type: 'weekly' | 'specific';
     name: string;
     names: string[];
     hoverIndex: number;
@@ -14,12 +14,13 @@ interface IndividualWeekDayTimeProps {
     dayIndex: number;
     clickState: boolean;
     setClickState: React.Dispatch<React.SetStateAction<boolean>>;
-    clientWeeklyDateMatrix: weeklyDateMatrixDay[]
-    setClientWeeklyDateMatrix: React.Dispatch<React.SetStateAction<weeklyDateMatrixDay[]>>
+    clientWeeklyDateMatrix: T;
+    setClientWeeklyDateMatrix: React.Dispatch<React.SetStateAction<T>>;
 }
 
-const IndividualWeekDayTime = ({
+const IndividualWeekDayTime = function <T>({
     i,
+    type,
     name,
     names,
     hoverIndex,
@@ -32,33 +33,36 @@ const IndividualWeekDayTime = ({
     setClickState,
     clientWeeklyDateMatrix,
     setClientWeeklyDateMatrix,
-}: IndividualWeekDayTimeProps) => {
+}: IndividualWeekDayTimeProps<T>) {
 
     const [selected, setSelected] = useState(false);
-    const [collabs, setCollabs] = useState(clientWeeklyDateMatrix[dayIndex].timedResponses[i].numTimeResponses);
+    const [collabs, setCollabs] = useState((clientWeeklyDateMatrix as any)[dayIndex].timedResponses[i].numTimeResponses);
 
     useEffect(() => {
         setSelected(false);
-        setCollabs(clientWeeklyDateMatrix[dayIndex].timedResponses[i].numTimeResponses);
+        setCollabs((clientWeeklyDateMatrix as any)[dayIndex].timedResponses[i].numTimeResponses);
     }, [respondMode]);
 
     const updateMatrixSelection = () => {
-        const newMatrix = [...clientWeeklyDateMatrix];
+        const newMatrix = [...clientWeeklyDateMatrix as any];
 
         if (newMatrix[dayIndex].timedResponses[i].names && 
             newMatrix[dayIndex].timedResponses[i].names.length > 0 &&
             newMatrix[dayIndex].timedResponses[i].names.includes(name)
         ) {
-            newMatrix[dayIndex].timedResponses[i].names = newMatrix[dayIndex].timedResponses[i].names.filter(n => n !== name);
+            newMatrix[dayIndex].timedResponses[i].names = newMatrix[dayIndex].timedResponses[i].names.filter((n: any) => n !== name);
             newMatrix[dayIndex].timedResponses[i].numTimeResponses -= 1;
-            setClientWeeklyDateMatrix(newMatrix);
+            if (type === 'weekly') setClientWeeklyDateMatrix(newMatrix as T);
+            if (type === 'specific') setClientWeeklyDateMatrix(newMatrix as T);
+            
             return;
         }
 
         newMatrix[dayIndex].timedResponses[i].names.push(name);
         newMatrix[dayIndex].timedResponses[i].numTimeResponses += 1;
 
-        setClientWeeklyDateMatrix(newMatrix);
+        if (type === 'weekly') setClientWeeklyDateMatrix(newMatrix as T);
+        if (type === 'specific') setClientWeeklyDateMatrix(newMatrix as T);
         return;
     };
 

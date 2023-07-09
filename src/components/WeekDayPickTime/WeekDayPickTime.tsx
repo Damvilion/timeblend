@@ -47,7 +47,7 @@ const WeekDayPickTime = ({
            </Flex>
            {weekDayMatrix.map((t, i) => {
                 return (
-                    <IndividualWeekDayTime setInspectCollab={setInspectCollab} inspectCollab={inspectCollab} hoverIndex={hoverIndex} setHoverIndex={setHoverIndex} name={name} names={names} respondMode={respondMode} key={i} i={i} dayIndex={index} clickState={clickState} setClickState={setClickState} clientWeeklyDateMatrix={clientWeeklyDateMatrix} setClientWeeklyDateMatrix={setClientWeeklyDateMatrix} />
+                    <IndividualWeekDayTime type='weekly' setInspectCollab={setInspectCollab} inspectCollab={inspectCollab} hoverIndex={hoverIndex} setHoverIndex={setHoverIndex} name={name} names={names} respondMode={respondMode} key={i} i={i} dayIndex={index} clickState={clickState} setClickState={setClickState} clientWeeklyDateMatrix={clientWeeklyDateMatrix} setClientWeeklyDateMatrix={setClientWeeklyDateMatrix as any} />
                 );
            })}
         </Flex>
